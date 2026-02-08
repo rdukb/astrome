@@ -1,0 +1,102 @@
+[
+  {
+    "id": "chennai",
+    "name": "Chennai",
+    "display_name": "Chennai, Tamil Nadu, India",
+    "latitude": 13.0827,
+    "longitude": 80.2707,
+    "timezone": "Asia/Kolkata",
+    "country": "India",
+    "state": "Tamil Nadu"
+  },
+  {
+    "id": "bangalore",
+    "name": "Bangalore",
+    "display_name": "Bangalore, Karnataka, India",
+    "latitude": 12.9716,
+    "longitude": 77.5946,
+    "timezone": "Asia/Kolkata",
+    "country": "India",
+    "state": "Karnataka"
+  },
+  {
+    "id": "mumbai",
+    "name": "Mumbai",
+    "display_name": "Mumbai, Maharashtra, India",
+    "latitude": 19.0760,
+    "longitude": 72.8777,
+    "timezone": "Asia/Kolkata",
+    "country": "India",
+    "state": "Maharashtra"
+  },
+  {
+    "id": "delhi",
+    "name": "Delhi",
+    "display_name": "Delhi, India",
+    "latitude": 28.7041,
+    "longitude": 77.1025,
+    "timezone": "Asia/Kolkata",
+    "country": "India",
+    "state": "Delhi"
+  },
+  {
+    "id": "hyderabad",
+    "name": "Hyderabad",
+    "display_name": "Hyderabad, Telangana, India",
+    "latitude": 17.3850,
+    "longitude": 78.4867,
+    "timezone": "Asia/Kolkata",
+    "country": "India",
+    "state": "Telangana"
+  },
+  {
+    "id": "pune",
+    "name": "Pune",
+    "display_name": "Pune, Maharashtra, India",
+    "latitude": 18.5204,
+    "longitude": 73.8567,
+    "timezone": "Asia/Kolkata",
+    "country": "India",
+    "state": "Maharashtra"
+  },
+  {
+    "id": "kolkata",
+    "name": "Kolkata",
+    "display_name": "Kolkata, West Bengal, India",
+    "latitude": 22.5726,
+    "longitude": 88.3639,
+    "timezone": "Asia/Kolkata",
+    "country": "India",
+    "state": "West Bengal"
+  },
+  {
+    "id": "ahmedabad",
+    "name": "Ahmedabad",
+    "display_name": "Ahmedabad, Gujarat, India",
+    "latitude": 23.0225,
+    "longitude": 72.5714,
+    "timezone": "Asia/Kolkata",
+    "country": "India",
+    "state": "Gujarat"
+  },
+  {
+    "id": "coimbatore",
+    "name": "Coimbatore",
+    "display_name": "Coimbatore, Tamil Nadu, India",
+    "latitude": 11.0168,
+    "longitude": 76.9558,
+    "timezone": "Asia/Kolkata",
+    "country": "India",
+    "state": "Tamil Nadu"
+  },
+  {
+    "id": "madurai",
+    "name": "Madurai",
+    "display_name": "Madurai, Tamil Nadu, India",
+    "latitude": 9.9252,
+    "longitude": 78.1198,
+    "timezone": "Asia/Kolkata",
+    "country": "India",
+    "state": "Tamil Nadu"
+  }
+]
