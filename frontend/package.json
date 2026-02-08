@@ -7,6 +7,7 @@
     "dev": "next dev -p 3453",
     "build": "next build",
     "start": "next start -p 3453",
+    "clear-cache": "node scripts/clear-cache.mjs",
     "lint": "next lint",
     "format": "prettier --write \"**/*.{js,jsx,ts,tsx,json,md}\"",
     "type-check": "tsc --noEmit",

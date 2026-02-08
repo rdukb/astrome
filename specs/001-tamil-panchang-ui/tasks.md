@@ -1,4 +1,4 @@
-# Tasks: Tamil Iyengar Panchang Web Application
+# Tasks: Tamil Panchangam Web Application
 
 **Input**: Design documents from `/specs/001-tamil-panchang-ui/`
 **Date**: 2026-02-06
@@ -215,7 +215,7 @@
 - [ ] T089 [US2] Add language toggle in frontend/components/layout/LanguageToggle.tsx switching between English/Tamil
 - [ ] T090 [US2] Implement i18n context in frontend/contexts/I18nContext.tsx managing current language state
 - [ ] T091 [US2] Update all TermTooltip instances to display definition based on current language (short_definition_en vs short_definition_ta)
-- [ ] T092 [US2] Add "Learn more" link in TermTooltip opening DefinitionModal with full explanation, Iyengar significance
+- [ ] T092 [US2] Add "Learn more" link in TermTooltip opening DefinitionModal with full explanation, tradition-specific significance
 - [ ] T093 [P] [US2] Style tooltips with Tailwind CSS using dark background, white text, rounded corners, drop shadow
 - [ ] T094 [P] [US2] Add accessibility attributes (aria-label, role="tooltip") to Tooltip component for screen readers
 

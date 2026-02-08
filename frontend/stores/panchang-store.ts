@@ -42,7 +42,7 @@ interface PanchangState {
   setError: (error: string | null) => void;
   reset: () => void;
   loadPanchang: (params: Omit<FetchDailyPanchangParams, 'location_id'>) => Promise<void>;
-  clearCache: () => void;
+  clearCache: () => Promise<void>;
   getCacheKey: (date: string, latitude: number, longitude: number, timezone: string) => string;
 }
 
@@ -184,8 +184,19 @@ export const usePanchangStore = create<PanchangState>()(
         },
 
         // Clear cache
-        clearCache: () => {
-          set({ cache: {} });
+        clearCache: async () => {
+          set({ cache: {}, currentPanchang: null });
+
+          if (typeof window !== 'undefined' && 'caches' in window) {
+            try {
+              const cacheNames = await window.caches.keys();
+              await Promise.all(cacheNames.map((cacheName) => window.caches.delete(cacheName)));
+              console.log('[PanchangStore] Browser CacheStorage cleared:', cacheNames);
+            } catch (error) {
+              console.warn('[PanchangStore] Failed to clear CacheStorage:', error);
+            }
+          }
+
           console.log('[PanchangStore] Cache cleared');
         },
 

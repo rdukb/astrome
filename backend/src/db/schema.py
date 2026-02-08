@@ -245,7 +245,7 @@ class TermDefinition(Base):
         short_definition_ta: Brief Tamil definition
         detailed_explanation_en: Full English explanation (multiple paragraphs)
         detailed_explanation_ta: Full Tamil explanation
-        significance_iyengar: Specific significance in Iyengar tradition
+        significance_tradition: Specific significance in Tamil tradition
         calculation_method: How the term is calculated (optional)
         related_terms: JSON array of related term_ids
         created_at: Record creation timestamp
@@ -309,10 +309,10 @@ class TermDefinition(Base):
     )
 
     # Additional information
-    significance_iyengar: Mapped[Optional[str]] = mapped_column(
+    significance_tradition: Mapped[Optional[str]] = mapped_column(
         Text,
         nullable=True,
-        doc="Specific significance in Iyengar tradition",
+        doc="Specific significance in Tamil tradition",
     )
     calculation_method: Mapped[Optional[str]] = mapped_column(
         Text,

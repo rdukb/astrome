@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: Tamil Panchang API
   description: |
-    REST API for Tamil Iyengar Panchang calculations based on Swiss Ephemeris.
+    REST API for Tamil Panchangam calculations based on Swiss Ephemeris.
     Provides daily Panchang data, location services, and term definitions.
   version: 1.0.0
   contact:
@@ -877,10 +877,10 @@ components:
         detailed_explanation_ta:
           type: string
           example: "ராகு காலம் நாளின் எட்டு பிரிவுகளில் ஒன்றாகும்..."
-        significance_iyengar:
+        significance_tradition:
           type: string
           nullable: true
-          example: "In Iyengar tradition, Rahu Kalam is strictly observed..."
+          example: "In Tamil tradition, Rahu Kalam is strictly observed..."
         calculation_method:
           type: string
           nullable: true

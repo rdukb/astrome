@@ -1,4 +1,4 @@
-# Data Model: Tamil Iyengar Panchang Web Application
+# Data Model: Tamil Panchangam Web Application
 
 **Feature Branch**: 001-tamil-panchang-ui  
 **Date**: 2026-02-06  
@@ -323,7 +323,7 @@ SPECIAL_DAY_TYPES = [
 | `short_definition_ta` | String | Yes | Brief Tamil definition | 50-200 characters |
 | `detailed_explanation_en` | String | Yes | Full English explanation | 200-2000 characters |
 | `detailed_explanation_ta` | String | Yes | Full Tamil explanation | 200-2000 characters |
-| `significance_iyengar` | String | No | Iyengar tradition specifics | 100-500 characters |
+| `significance_tradition` | String | No | Tamil tradition specifics | 100-500 characters |
 | `calculation_method` | String | No | How it's calculated | For technical users |
 | `related_terms` | Array<String> | No | Related term IDs | References to other terms |
 | `sources` | Array<String> | No | Reference sources | e.g., ["Vedic texts", "Tradition"] |

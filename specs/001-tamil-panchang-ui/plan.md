@@ -1,4 +1,4 @@
-# Implementation Plan: Tamil Iyengar Panchang Web Application
+# Implementation Plan: Tamil Panchangam Web Application
 
 **Branch**: `001-tamil-panchang-ui` | **Date**: 2026-02-06 | **Spec**: [spec.md](spec.md)
 **Input**: Feature specification for Tamil Panchang web app with modern UI
@@ -116,9 +116,9 @@ Build a Progressive Web Application displaying daily Tamil Panchang (Hindu alman
 **Requirement**: Support multiple astrological systems, respect cultural contexts, no imposed framework
 
 **Compliance**: ✅ PASS
-- Focus on Vedic/South Indian Panchang system (appropriate for Iyengar Brahmin tradition)
+- Focus on Vedic/South Indian Panchang system (appropriate for Tamil Vaishnava traditions)
 - Tamil and English language support with culturally appropriate terminology
-- Term explanations specific to Iyengar observances and practices
+- Term explanations specific to Tamil observances and practices
 - No "recommended" or "best" practices imposed - user interprets based on tradition
 - Extensible i18n framework allows future addition of other regional traditions
 - Respectful iconography and visual design

@@ -135,7 +135,7 @@ export interface TermDefinition {
   short_definition_ta: string;
   detailed_explanation_en: string;
   detailed_explanation_ta: string;
-  significance_iyengar?: string;
+  significance_tradition?: string;
   calculation_method?: string;
   related_terms?: string[];
 }

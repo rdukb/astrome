@@ -68,7 +68,7 @@ def upgrade() -> None:
     sa.Column('name_ta', sa.String(length=255), nullable=False),
     sa.Column('short_definition_ta', sa.Text(), nullable=False),
     sa.Column('detailed_explanation_ta', sa.Text(), nullable=False),
-    sa.Column('significance_iyengar', sa.Text(), nullable=True),
+    sa.Column('significance_tradition', sa.Text(), nullable=True),
     sa.Column('calculation_method', sa.Text(), nullable=True),
     sa.Column('related_terms', sa.JSON(), nullable=True),
     sa.Column('created_at', sa.DateTime(), nullable=False),

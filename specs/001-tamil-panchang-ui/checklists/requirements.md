@@ -1,4 +1,4 @@
-# Specification Quality Checklist: Tamil Iyengar Panchang Web Application
+# Specification Quality Checklist: Tamil Panchangam Web Application
 
 **Purpose**: Validate specification completeness and quality before proceeding to planning
 **Created**: 2026-02-06
@@ -61,7 +61,7 @@ Validating against Astrome Constitution v1.0.0:
 - ✅ **Location-Based Calculations** (Principle II): FR-002, FR-010, FR-011 address location handling; FR-018 ensures transparency
 - ✅ **Data Privacy & Security** (Principle III): FR-015 specifies local storage; Out of Scope excludes cloud sync
 - ✅ **Offline-First Architecture** (Principle IV): FR-014 requires offline functionality for cached data; SC-006 validates 1-second offline load
-- ✅ **Cultural Sensitivity** (Principle V): FR-008, FR-009 support Tamil/English; focus on Iyengar traditions throughout
+- ✅ **Cultural Sensitivity** (Principle V): FR-008, FR-009 support Tamil/English; focus on Tamil traditions throughout
 
 ## Notes
 

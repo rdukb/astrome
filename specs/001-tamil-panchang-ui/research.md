@@ -1,4 +1,4 @@
-# Research: Tamil Iyengar Panchang Web Application
+# Research: Tamil Panchangam Web Application
 
 **Date**: 2026-02-06  
 **Branch**: 001-tamil-panchang-ui  
@@ -549,7 +549,7 @@ def get_tamil_solar_month(julian_day, ayanamsa):
 **Primary Validation**:
 1. **drikpanchang.com** - Most accurate online Panchang (uses Drik Ganita)
 2. **prokerala.com** - Comprehensive Panchang with multiple ayanamsa options
-3. **ahobilamutt.org calendar** - Iyengar tradition-specific
+3. **ahobilamutt.org calendar** - tradition-specific
 
 **Validation Approach**:
 ```python
@@ -711,8 +711,8 @@ const searchCity = async (query: string) => {
 **Research Sources**:
 1. **Wikipedia** - Basic definitions (CC-BY-SA license)
 2. **Vedic astrology texts** - Traditional explanations
-3. **Iyengar sampradaya texts** - Community-specific observances
-4. **ahobilamutt.org** - Iyengar tradition content (reference only, rewrite in own words)
+3. **Vaishnava sampradaya texts** - Community-specific observances
+4. **ahobilamutt.org** - traditional calendar content (reference only, rewrite in own words)
 
 ### 5.2 Definition Structure
 
@@ -726,7 +726,7 @@ const searchCity = async (query: string) => {
   "short_definition_ta": "ராகு ஆளும் 90 நிமிட அசுப காலம்",
   "detailed_explanation_en": "Rahu Kalam is one of the eight segments of the day... Activities to avoid: Starting new ventures, travel, important decisions...",
   "detailed_explanation_ta": "...",
-  "significance_iyengar": "In Iyengar tradition, Rahu Kalam is strictly observed for...",
+  "significance_tradition": "In Tamil tradition, Rahu Kalam is strictly observed for...",
   "calculation_method": "Divide day (sunrise to sunset) into 8 equal parts. Rahu Kalam varies by weekday.",
   "related_terms": ["gulika_kalam", "yamaganda", "durmuhurtam"],
   "sources": ["Brihat Parashara Hora Shastra", "Jyotish tradition"]
@@ -921,7 +921,7 @@ httpx==0.25.1              # HTTP client for testing
 | Validation Source | drikpanchang.com | Most accurate online reference for Vedic calculations |
 | Geolocation | Browser API + Nominatim | Free, privacy-respecting, no API keys |
 | City Database | Top 100 Indian cities preloaded | Instant search, offline-capable |
-| Term Definitions | Original content + research | CC-BY-SA sources, Iyengar tradition additions |
+| Term Definitions | Original content + research | CC-BY-SA sources, tradition-specific additions |
 | Timezone | Olson/IANA timezone database | Standard across all platforms |
 
 ### 8.2 Implementation Priorities
@@ -980,7 +980,7 @@ All critical unknowns resolved:
 
 - Tamil Virtual Academy: https://www.tamilvu.org/
 - Government of Tamil Nadu Calendar
-- Ahobila Mutt Publications (for Iyengar tradition specifics)
+- Ahobila Mutt Publications (for traditional observance specifics)
 
 ### 9.4 OpenStreetMap
 

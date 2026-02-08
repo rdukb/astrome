@@ -26,11 +26,12 @@ export default function PanchangPage() {
     error,
     setSelectedDate,
     loadPanchang,
-    preferences,
+    clearCache,
   } = usePanchangStore();
 
   const { coordinates, loading: geoLoading, requestLocation } = useGeolocation();
   const [hasRequestedLocation, setHasRequestedLocation] = useState(false);
+  const [isClearingCache, setIsClearingCache] = useState(false);
 
   // Request geolocation on mount if no location is set
   useEffect(() => {
@@ -67,6 +68,25 @@ export default function PanchangPage() {
 
   const handleDateChange = (newDate: string) => {
     setSelectedDate(newDate);
+  };
+
+  const handleClearCache = async () => {
+    setIsClearingCache(true);
+    try {
+      await clearCache();
+
+      const location = selectedLocation || coordinates;
+      if (location) {
+        await loadPanchang({
+          date: selectedDate,
+          latitude: location.latitude,
+          longitude: location.longitude,
+          timezone: selectedLocation?.timezone || Intl.DateTimeFormat().resolvedOptions().timeZone,
+        });
+      }
+    } finally {
+      setIsClearingCache(false);
+    }
   };
 
   // Show loading skeleton
@@ -202,6 +222,15 @@ export default function PanchangPage() {
           <p className="mt-3 text-base sm:text-lg text-gray-600 dark:text-dark-text-secondary font-medium">
             Daily Vedic Almanac for Auspicious Timing
           </p>
+          <div className="mt-4">
+            <button
+              onClick={handleClearCache}
+              disabled={isClearingCache}
+              className="inline-flex items-center rounded-lg border border-gray-300 bg-white/80 px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-60 dark:border-slate-700 dark:bg-slate-900/60 dark:text-slate-200 dark:hover:bg-slate-800"
+            >
+              {isClearingCache ? 'Clearing Cache...' : 'Clear Cache & Refresh'}
+            </button>
+          </div>
         </header>
 
         {/* Location and Date */}
