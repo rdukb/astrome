@@ -5,14 +5,18 @@
 
 import { Card } from '@/components/ui/Card';
 import { formatTime as formatPanchangTime } from '@/lib/format-time';
+import { cn } from '@/lib/utils';
+import { AlertTriangle } from 'lucide-react';
+import { motion } from 'motion/react';
 import type { DailyPanchang, TimePeriod } from '@/types/panchang';
 import React from 'react';
 
 interface InauspiciousTimesCardProps {
   panchang: DailyPanchang;
+  className?: string;
 }
 
-export const InauspiciousTimesCard: React.FC<InauspiciousTimesCardProps> = ({ panchang }) => {
+export const InauspiciousTimesCard: React.FC<InauspiciousTimesCardProps> = ({ panchang, className }) => {
   const formatTime = (isoString: string) =>
     formatPanchangTime(isoString, { timezone: panchang.timezone });
 
@@ -21,36 +25,46 @@ export const InauspiciousTimesCard: React.FC<InauspiciousTimesCardProps> = ({ pa
     period: TimePeriod;
     showWarning?: boolean;
   }> = ({ label, period, showWarning = true }) => (
-    <div className="p-4 rounded-xl bg-gray-100 dark:bg-dark-border/30 border-l-4 border-red-500 hover:shadow-md hover:border-red-400 transition-all">
+    <div className="p-3 rounded-xl bg-slate-700/30 border-l-4 border-rose-500/60 hover:bg-slate-700/40 hover:border-rose-400 transition-all duration-300">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          {showWarning && <span className="text-red-600 dark:text-red-400 text-xl">⚠️</span>}
-          <span className="font-bold text-red-700 dark:text-red-300">{label}</span>
+          {showWarning && <AlertTriangle className="h-3 w-3 text-rose-400" />}
+          <span className="font-bold text-rose-300 text-sm">{label}</span>
         </div>
-        <span className="text-xs px-3 py-1.5 bg-red-500/20 text-red-300 rounded-full font-semibold shadow-sm border border-red-500/30">
+        <span className="text-xs px-2 py-0.5 bg-rose-500/20 text-rose-300 rounded-full font-medium border border-rose-500/40">
           {period.duration_minutes} min
         </span>
       </div>
-      <div className="mt-3 text-sm text-gray-900 dark:text-dark-text-primary flex items-center gap-4 font-medium">
-        <span className="bg-gray-50 dark:bg-dark-card border border-gray-200 dark:border-dark-border px-2 py-1 rounded">{formatTime(period.start_time)}</span>
-        <span className="text-red-400">→</span>
-        <span className="bg-gray-50 dark:bg-dark-card border border-gray-200 dark:border-dark-border px-2 py-1 rounded">{formatTime(period.end_time)}</span>
+      <div className="mt-3 text-xs text-slate-100 flex items-center gap-3 font-medium">
+        <span className="bg-slate-800/60 border border-slate-700/60 px-2 py-1 rounded">{formatTime(period.start_time)}</span>
+        <span className="text-rose-400">→</span>
+        <span className="bg-slate-800/60 border border-slate-700/60 px-2 py-1 rounded">{formatTime(period.end_time)}</span>
       </div>
     </div>
   );
 
   return (
-    <Card className="p-6 shadow-lg hover:shadow-xl transition-shadow duration-300">
-      <div className="flex items-center gap-3 mb-6 pb-2 border-b-2 border-red-500/50">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-dark-text-primary">
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4, delay: 0.3 }}
+    >
+      <Card
+        className={cn(
+          'rounded-2xl p-4 shadow-xl hover:shadow-2xl transition-all duration-300 bg-slate-800/60 backdrop-blur-lg border border-slate-700/50 hover:border-slate-600/50',
+          className
+        )}
+      >
+      <div className="flex items-center gap-3 mb-6 pb-2 border-b border-slate-600/50">
+        <h2 className="text-lg font-bold text-rose-400">
           Inauspicious Times
         </h2>
-        <span className="text-xs px-3 py-1.5 bg-red-500/20 text-red-300 rounded-full font-bold shadow-sm border border-red-500/30">
-          Avoid Important Activities
+        <span className="text-xs px-2 py-0.5 bg-rose-500/20 text-rose-300 rounded-full font-medium border border-rose-500/40">
+          Avoid
         </span>
       </div>
 
-      <div className="space-y-3">
+      <div className="space-y-2">
         {/* Rahu Kalam */}
         <TimePeriodRow
           label="Rahu Kalam"
@@ -71,9 +85,9 @@ export const InauspiciousTimesCard: React.FC<InauspiciousTimesCardProps> = ({ pa
 
         {/* Durmuhurtam */}
         {panchang.durmuhurtam && panchang.durmuhurtam.length > 0 && (
-          <div className="mt-6 pt-6 border-t-2 border-red-300">
-            <h3 className="font-bold text-gray-900 dark:text-dark-text-primary mb-4 text-lg flex items-center gap-2">
-              <span className="text-red-600">📵</span>
+          <div className="mt-6 pt-6 border-t border-rose-500/20">
+            <h3 className="font-bold text-slate-200 mb-4 text-sm flex items-center gap-2">
+              <AlertTriangle className="h-3 w-3 text-rose-400" />
               Durmuhurtam Periods
             </h3>
             <div className="space-y-3">
@@ -91,9 +105,9 @@ export const InauspiciousTimesCard: React.FC<InauspiciousTimesCardProps> = ({ pa
 
         {/* Varjyam */}
         {panchang.varjyam && (
-          <div className="mt-6 pt-6 border-t-2 border-red-300">
-            <h3 className="font-bold text-gray-900 dark:text-dark-text-primary mb-4 text-lg flex items-center gap-2">
-              <span className="text-red-600">🚫</span>
+          <div className="mt-6 pt-6 border-t border-rose-500/20">
+            <h3 className="font-bold text-slate-200 mb-4 text-sm flex items-center gap-2">
+              <AlertTriangle className="h-3 w-3 text-rose-400" />
               Varjyam
             </h3>
             <TimePeriodRow
@@ -105,12 +119,13 @@ export const InauspiciousTimesCard: React.FC<InauspiciousTimesCardProps> = ({ pa
       </div>
 
       {/* Info Note */}
-      <div className="mt-6 p-4 bg-yellow-50 dark:bg-yellow-500/10 border-l-4 border-yellow-400 dark:border-yellow-500 rounded-lg shadow-sm">
-        <p className="text-sm text-yellow-900 dark:text-yellow-200 leading-relaxed">
-          <strong className="text-yellow-800 dark:text-yellow-300">⚡ Important:</strong> These periods are traditionally considered inauspicious
-          for starting new ventures, signing contracts, or performing important ceremonies. Plan accordingly.
+      <div className="mt-3 p-3 bg-amber-500/10 border-l-4 border-amber-400/60 rounded-lg">
+        <p className="text-xs text-amber-200 leading-relaxed">
+          <strong className="text-amber-300">⚡ Important:</strong> Avoid starting new
+          ventures, signing contracts, or important ceremonies during these periods.
         </p>
       </div>
-    </Card>
+      </Card>
+    </motion.div>
   );
 };

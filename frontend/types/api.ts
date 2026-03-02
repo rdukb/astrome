@@ -127,17 +127,18 @@ export interface NearbyLocationQuery {
 // ============================================================================
 
 export interface TermDefinition {
-  id: string; // UUID
   term_id: string; // Slug identifier
-  name_en: string;
-  name_ta: string;
-  short_definition_en: string;
-  short_definition_ta: string;
-  detailed_explanation_en: string;
-  detailed_explanation_ta: string;
-  significance_tradition?: string;
-  calculation_method?: string;
-  related_terms?: string[];
+  name_en?: string | null;
+  name_ta?: string | null;
+  short_definition_en?: string | null;
+  short_definition_ta?: string | null;
+  detailed_explanation_en?: string | null;
+  detailed_explanation_ta?: string | null;
+  significance_tradition?: string | null;
+  calculation_method?: string | null;
+  related_terms?: string[] | null;
+  sources?: string[] | null;
+  icon?: string | null;
 }
 
 // ============================================================================
@@ -174,8 +175,9 @@ export interface LocationsResponse {
 }
 
 export interface TermDefinitionsResponse {
-  data: TermDefinition[];
-  total: number;
+  definitions: TermDefinition[];
+  count: number;
+  language: 'en' | 'ta' | 'both';
 }
 
 export interface HealthResponse {

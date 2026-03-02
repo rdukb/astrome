@@ -1,82 +1,38 @@
 'use client';
 
-import React, { createContext, useContext, useEffect, useState } from 'react';
+/**
+ * ThemeContext — Astrome is a dark-only UI.
+ *
+ * The `.dark` class is applied once on mount and never removed.
+ * The context is kept in place so existing `useTheme()` call sites
+ * continue to compile without changes.
+ */
 
-type Theme = 'light' | 'dark' | 'system';
+import React, { createContext, useContext, useEffect } from 'react';
 
 interface ThemeContextType {
-  theme: Theme;
-  setTheme: (theme: Theme) => void;
-  effectiveTheme: 'light' | 'dark';
+  theme: 'dark';
+  effectiveTheme: 'dark';
 }
 
-const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
+const ThemeContext = createContext<ThemeContextType>({
+  theme: 'dark',
+  effectiveTheme: 'dark',
+});
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setThemeState] = useState<Theme>('dark'); // Default to dark
-  const [effectiveTheme, setEffectiveTheme] = useState<'light' | 'dark'>('dark');
-
+  // Ensure the `dark` class is always present on <html>
   useEffect(() => {
-    // Load theme from localStorage
-    const savedTheme = localStorage.getItem('theme') as Theme | null;
-    if (savedTheme) {
-      setThemeState(savedTheme);
-    } else {
-      // Default to dark theme
-      setThemeState('dark');
-      localStorage.setItem('theme', 'dark');
-    }
+    document.documentElement.classList.add('dark');
   }, []);
 
-  useEffect(() => {
-    // Determine effective theme
-    let effective: 'light' | 'dark' = 'dark';
-
-    if (theme === 'system') {
-      effective = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-    } else {
-      effective = theme;
-    }
-
-    setEffectiveTheme(effective);
-
-    // Apply theme to document
-    if (effective === 'dark') {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
-  }, [theme]);
-
-  // Listen for system theme changes
-  useEffect(() => {
-    if (theme !== 'system') return;
-
-    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-    const handleChange = (e: MediaQueryListEvent) => {
-      setEffectiveTheme(e.matches ? 'dark' : 'light');
-    };
-
-    mediaQuery.addEventListener('change', handleChange);
-    return () => mediaQuery.removeEventListener('change', handleChange);
-  }, [theme]);
-
-  const setTheme = (newTheme: Theme) => {
-    setThemeState(newTheme);
-    localStorage.setItem('theme', newTheme);
-  };
-
   return (
-    <ThemeContext.Provider value={{ theme, setTheme, effectiveTheme }}>
+    <ThemeContext.Provider value={{ theme: 'dark', effectiveTheme: 'dark' }}>
       {children}
     </ThemeContext.Provider>
   );
 }
 
 export function useTheme() {
-  const context = useContext(ThemeContext);
-  if (context === undefined) {
-    throw new Error('useTheme must be used within a ThemeProvider');
-  }
-  return context;
+  return useContext(ThemeContext);
 }

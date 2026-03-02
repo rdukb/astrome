@@ -1,98 +1,112 @@
 /**
  * SunTimesCard Component
- * Displays sunrise, sunset, moonrise, and moonset times
+ * Displays compact sunrise/sunset/moonrise/moonset stats
  */
 
 import { Card } from '@/components/ui/Card';
 import { formatTime as formatPanchangTime } from '@/lib/format-time';
+import { cn } from '@/lib/utils';
+import { Clock, Moon, MoonStar, Sunrise, Sunset } from 'lucide-react';
+import { motion } from 'motion/react';
 import type { DailyPanchang } from '@/types/panchang';
 import React from 'react';
 
 interface SunTimesCardProps {
   panchang: DailyPanchang;
+  className?: string;
 }
 
-export const SunTimesCard: React.FC<SunTimesCardProps> = ({ panchang }) => {
+export const SunTimesCard: React.FC<SunTimesCardProps> = ({ panchang, className }) => {
   const formatTime = (isoString: string) =>
     formatPanchangTime(isoString, { timezone: panchang.timezone });
 
+  const dayLength = (() => {
+    const sunrise = new Date(panchang.sunrise);
+    const sunset = new Date(panchang.sunset);
+    const diff = Math.max(0, sunset.getTime() - sunrise.getTime());
+    const hours = Math.floor(diff / (1000 * 60 * 60));
+    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+    return `${hours}h ${minutes}m`;
+  })();
+
   const timeItems = [
     {
-      icon: '🌅',
+      icon: Sunrise,
       label: 'Sunrise',
       time: panchang.sunrise,
-      color: 'text-orange-600',
-      bgColor: 'bg-orange-50'
+      color: 'text-orange-400',
     },
     {
-      icon: '🌇',
+      icon: Sunset,
       label: 'Sunset',
       time: panchang.sunset,
-      color: 'text-orange-800',
-      bgColor: 'bg-orange-100'
+      color: 'text-orange-500',
     },
     {
-      icon: '🌙',
+      icon: Moon,
       label: 'Moonrise',
       time: panchang.moonrise,
-      color: 'text-blue-600',
-      bgColor: 'bg-blue-50'
+      color: 'text-cyan-400',
     },
     {
-      icon: '🌘',
+      icon: MoonStar,
       label: 'Moonset',
       time: panchang.moonset,
-      color: 'text-blue-800',
-      bgColor: 'bg-blue-100'
-    }
+      color: 'text-cyan-500',
+    },
   ];
 
   return (
-    <Card className="p-6 shadow-lg hover:shadow-xl transition-shadow duration-300 bg-white dark:bg-dark-card border border-gray-200 dark:border-dark-border backdrop-blur-sm">
-      <h2 className="text-2xl font-bold mb-6 text-gray-900 dark:text-dark-text-primary border-b-2 border-purple-500/50 pb-2">
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4, delay: 0.1 }}
+    >
+      <Card
+        className={cn(
+          'rounded-2xl p-4 shadow-xl hover:shadow-2xl transition-all duration-300 bg-slate-800/60 backdrop-blur-lg border border-slate-700/50 hover:border-slate-600/50',
+          className
+        )}
+      >
+      <h2 className="text-lg font-bold mb-3 pb-2 border-b border-slate-600/50 text-cyan-400">
         Sun & Moon Times
       </h2>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div className="grid grid-cols-2 gap-3">
         {timeItems.map((item, index) => (
-          <div
+          <motion.div
             key={index}
-            className="p-5 rounded-xl bg-gray-100 dark:bg-dark-border/30 border border-gray-200 dark:border-dark-border transition-all hover:scale-105 hover:shadow-lg hover:border-purple-400 dark:hover:border-purple-400/50 duration-300"
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.3, delay: 0.1 + index * 0.05 }}
+            className="rounded-xl border border-slate-700/60 bg-slate-700/30 p-3 transition-all duration-300 hover:border-cyan-500/40 hover:bg-slate-700/40"
           >
-            <div className="flex items-center gap-3">
-              <span className="text-4xl">{item.icon}</span>
-              <div>
-                <div className="text-sm font-semibold text-gray-600 dark:text-dark-text-secondary mb-1">
+            <div className="flex items-center gap-2">
+              <item.icon className={cn('h-5 w-5', item.color)} />
+              <div className="min-w-0">
+                <p className="text-xs font-semibold tracking-wide uppercase text-slate-400">
                   {item.label}
-                </div>
-                <div className="text-2xl font-bold text-gray-900 dark:text-dark-text-primary">
+                </p>
+                <p className="text-lg font-bold text-white whitespace-nowrap">
                   {formatTime(item.time)}
-                </div>
+                </p>
               </div>
             </div>
-          </div>
+          </motion.div>
         ))}
-      </div>
-
-      {/* Day Length */}
-      <div className="mt-6 p-5 bg-gray-100 dark:bg-dark-border/30 rounded-xl border border-gray-200 dark:border-dark-border">
-        <div className="flex items-center justify-between">
+        <div className="rounded-xl border border-slate-700/60 bg-slate-700/30 p-3 col-span-2">
           <div className="flex items-center gap-2">
-            <span className="text-2xl">⏱️</span>
-            <span className="text-sm font-semibold text-gray-700 dark:text-dark-text-secondary">Day Length</span>
+            <Clock className="h-5 w-5 text-cyan-400" />
+            <div>
+              <p className="text-xs font-semibold tracking-wide uppercase text-slate-400">
+                Day Length
+              </p>
+              <p className="text-lg font-bold text-white">{dayLength}</p>
+            </div>
           </div>
-          <span className="text-xl font-bold text-gray-900 dark:text-dark-text-primary">
-            {(() => {
-              const sunrise = new Date(panchang.sunrise);
-              const sunset = new Date(panchang.sunset);
-              const diff = sunset.getTime() - sunrise.getTime();
-              const hours = Math.floor(diff / (1000 * 60 * 60));
-              const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-              return `${hours}h ${minutes}m`;
-            })()}
-          </span>
         </div>
       </div>
-    </Card>
+      </Card>
+    </motion.div>
   );
 };

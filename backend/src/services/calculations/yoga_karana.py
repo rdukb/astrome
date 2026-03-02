@@ -15,21 +15,23 @@ KARANA_MIN_DAYS = 5 / 24
 KARANA_MAX_DAYS = 7 / 24
 
 
-def calculate_yoga(julian_day: float, timezone_offset_hours: float = 0) -> YogaInfo:
+def calculate_yoga(julian_day: float, sunrise_jd: float) -> YogaInfo:
     """
-    Calculate Yoga for given Julian Day
+    Calculate Yoga for given Julian Day.
 
     Yoga = (Sun longitude + Moon longitude) / 13.333°
+
+    Args:
+        julian_day: Julian Day Number (UTC midnight of the calculation date)
+        sunrise_jd: Actual sunrise Julian Day from sun.py (used for at_sunrise flag)
     """
     swe.set_sid_mode(swe.SIDM_LAHIRI)
     ayanamsa = swe.get_ayanamsa_ut(julian_day)
 
     # Get Sun and Moon longitudes
     sun_data, _ = swe.calc_ut(julian_day, swe.SUN)
-
     sun_long = sun_data[0]
     moon_data, _ = swe.calc_ut(julian_day, swe.MOON)
-
     moon_long = moon_data[0]
 
     # Apply ayanamsa
@@ -42,12 +44,11 @@ def calculate_yoga(julian_day: float, timezone_offset_hours: float = 0) -> YogaI
     if yoga_num > 27:
         yoga_num = 27
 
-    # Find Yoga start and end times
+    # Find Yoga start and end times using bisection for ~1-minute precision
     yoga_start_jd = find_yoga_start(julian_day, yoga_num, ayanamsa)
     yoga_end_jd = find_yoga_end(julian_day, yoga_num, ayanamsa)
 
-    # Check if at sunrise
-    sunrise_jd = julian_day + (6.0 / 24.0) + (timezone_offset_hours / 24.0)
+    # at_sunrise: use the real sunrise_jd passed in (not a crude 6 AM estimate)
     at_sunrise = yoga_start_jd <= sunrise_jd < yoga_end_jd
 
     return YogaInfo(
@@ -137,29 +138,69 @@ def get_karana_name(karana_index: int) -> tuple[str, str]:
         return KARANA_MOVABLE[movable_index], "Movable"
 
 
+def _bisect_yoga_longitude(
+    target: float, lo_jd: float, hi_jd: float, ayanamsa: float, tolerance_deg: float = 0.0042
+) -> float:
+    """
+    Binary-search for the Julian Day when Yoga longitude (Sun + Moon sidereal sum)
+    crosses ``target`` degrees.
+
+    tolerance_deg defaults to 0.0042° ≈ 1 arc-minute.  The combined Sun+Moon
+    longitude changes at ~0.55°/hr, so this tolerance keeps boundaries within
+    ~1 minute of the true crossing.
+    """
+    for _ in range(50):
+        mid_jd = (lo_jd + hi_jd) / 2.0
+        if (hi_jd - lo_jd) * 24 * 60 < 1.0:  # bracket < 1 minute → done
+            return mid_jd
+        mid_yoga = get_yoga_longitude(mid_jd, ayanamsa)
+        diff = (mid_yoga - target + 180) % 360 - 180
+        if abs(diff) < tolerance_deg:
+            return mid_jd
+        lo_yoga = get_yoga_longitude(lo_jd, ayanamsa)
+        lo_diff = (lo_yoga - target + 180) % 360 - 180
+        if lo_diff * diff <= 0:
+            hi_jd = mid_jd
+        else:
+            lo_jd = mid_jd
+    return (lo_jd + hi_jd) / 2.0
+
+
 def find_yoga_start(reference_jd: float, yoga_num: int, ayanamsa: float) -> float:
-    """Find when Yoga starts"""
-    target = (yoga_num - 1) * (360 / 27)
-    jd = reference_jd - 1.0
-    for _ in range(30):
+    """Find when Yoga starts using coarse bracket + bisection (~1-minute precision)."""
+    target = (yoga_num - 1) * (360.0 / 27)
+
+    step = 0.5 / 24  # 30-minute steps
+    jd = reference_jd - step
+    prev_jd = reference_jd
+    for _ in range(96):  # up to 2 days back
         yoga_long = get_yoga_longitude(jd, ayanamsa)
-        if abs(yoga_long - target) < 0.1:
-            return jd
-        jd -= 0.02
+        prev_yoga_long = get_yoga_longitude(prev_jd, ayanamsa)
+        diff = (yoga_long - target + 180) % 360 - 180
+        prev_diff = (prev_yoga_long - target + 180) % 360 - 180
+        if diff * prev_diff <= 0:
+            return _bisect_yoga_longitude(target, jd, prev_jd, ayanamsa)
+        prev_jd = jd
+        jd -= step
     return reference_jd - 0.5
 
 
 def find_yoga_end(reference_jd: float, yoga_num: int, ayanamsa: float) -> float:
-    """Find when Yoga ends"""
-    target = yoga_num * (360 / 27)
-    if target >= 360:
-        target = 0
-    jd = reference_jd
-    for _ in range(30):
+    """Find when Yoga ends using coarse bracket + bisection (~1-minute precision)."""
+    target = (yoga_num * (360.0 / 27)) % 360
+
+    step = 0.5 / 24  # 30-minute steps
+    prev_jd = reference_jd
+    jd = reference_jd + step
+    for _ in range(96):  # up to 2 days ahead
         yoga_long = get_yoga_longitude(jd, ayanamsa)
-        if abs(yoga_long - target) < 0.1:
-            return jd
-        jd += 0.02
+        prev_yoga_long = get_yoga_longitude(prev_jd, ayanamsa)
+        diff = (yoga_long - target + 180) % 360 - 180
+        prev_diff = (prev_yoga_long - target + 180) % 360 - 180
+        if prev_diff * diff <= 0:
+            return _bisect_yoga_longitude(target, prev_jd, jd, ayanamsa)
+        prev_jd = jd
+        jd += step
     return reference_jd + 1.0
 
 

@@ -5,14 +5,18 @@
 
 import { Card } from '@/components/ui/Card';
 import { formatTime as formatPanchangTime } from '@/lib/format-time';
+import { cn } from '@/lib/utils';
+import { Sparkles, Sunrise } from 'lucide-react';
+import { motion } from 'motion/react';
 import type { DailyPanchang, TimePeriod } from '@/types/panchang';
 import React from 'react';
 
 interface AuspiciousTimesCardProps {
   panchang: DailyPanchang;
+  className?: string;
 }
 
-export const AuspiciousTimesCard: React.FC<AuspiciousTimesCardProps> = ({ panchang }) => {
+export const AuspiciousTimesCard: React.FC<AuspiciousTimesCardProps> = ({ panchang, className }) => {
   const formatTime = (isoString: string) =>
     formatPanchangTime(isoString, { timezone: panchang.timezone });
 
@@ -20,45 +24,55 @@ export const AuspiciousTimesCard: React.FC<AuspiciousTimesCardProps> = ({ pancha
     label: string;
     description: string;
     period: TimePeriod;
-    icon: string;
+    icon: React.ReactNode;
   }> = ({ label, description, period, icon }) => (
-    <div className="p-5 rounded-xl bg-gray-100 dark:bg-dark-border/30 border-l-4 border-green-500 hover:shadow-lg hover:border-green-400 transition-all">
+    <div className="p-3 rounded-xl bg-slate-700/30 border-l-4 border-emerald-500/60 hover:bg-slate-700/40 hover:border-emerald-400 transition-all duration-300">
       <div className="flex items-center justify-between mb-3">
-        <div className="flex items-center gap-3">
-          <span className="text-2xl">{icon}</span>
-          <span className="font-bold text-green-700 dark:text-green-300 text-lg">{label}</span>
+        <div className="flex items-center gap-2">
+          <span className="text-emerald-400">{icon}</span>
+          <span className="font-bold text-emerald-300 text-sm">{label}</span>
         </div>
-        <span className="text-xs px-3 py-1.5 bg-green-500/20 text-green-300 rounded-full font-bold shadow-sm border border-green-500/30">
+        <span className="text-xs px-2 py-0.5 bg-emerald-500/20 text-emerald-300 rounded-full font-medium border border-emerald-500/40">
           {period.duration_minutes} min
         </span>
       </div>
-      <p className="text-sm text-gray-600 dark:text-dark-text-secondary mb-3 leading-relaxed">{description}</p>
-      <div className="text-sm text-gray-900 dark:text-dark-text-primary font-semibold flex items-center gap-4">
-        <span className="bg-gray-50 dark:bg-dark-card border border-gray-200 dark:border-dark-border px-3 py-1.5 rounded shadow-sm">{formatTime(period.start_time)}</span>
-        <span className="text-green-400">→</span>
-        <span className="bg-gray-50 dark:bg-dark-card border border-gray-200 dark:border-dark-border px-3 py-1.5 rounded shadow-sm">{formatTime(period.end_time)}</span>
+      <p className="text-xs text-slate-300 mb-3 leading-relaxed">{description}</p>
+      <div className="text-xs text-slate-100 font-semibold flex items-center gap-3">
+        <span className="bg-slate-800/60 border border-slate-700/60 px-2 py-1 rounded">{formatTime(period.start_time)}</span>
+        <span className="text-emerald-400">→</span>
+        <span className="bg-slate-800/60 border border-slate-700/60 px-2 py-1 rounded">{formatTime(period.end_time)}</span>
       </div>
     </div>
   );
 
   return (
-    <Card className="p-6 shadow-lg hover:shadow-xl transition-shadow duration-300">
-      <div className="flex items-center gap-3 mb-6 pb-2 border-b-2 border-green-500/50">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-dark-text-primary">
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4, delay: 0.2 }}
+    >
+      <Card
+        className={cn(
+          'rounded-2xl p-4 shadow-xl hover:shadow-2xl transition-all duration-300 bg-slate-800/60 backdrop-blur-lg border border-slate-700/50 hover:border-slate-600/50',
+          className
+        )}
+      >
+      <div className="flex items-center gap-3 mb-6 pb-2 border-b border-slate-600/50">
+        <h2 className="text-lg font-bold text-emerald-400">
           Auspicious Times
         </h2>
-        <span className="text-xs px-3 py-1.5 bg-green-500/20 text-green-300 rounded-full font-bold shadow-sm border border-green-500/30">
-          Favorable for Activities
+        <span className="text-xs px-2 py-0.5 bg-emerald-500/20 text-emerald-300 rounded-full font-medium border border-emerald-500/40">
+          Favorable
         </span>
       </div>
 
-      <div className="space-y-5">
+      <div className="space-y-3">
         {/* Abhijit Muhurat */}
         <TimePeriodRow
           label="Abhijit Muhurat"
           description="The most auspicious period of the day, around noon. Ideal for starting new ventures, signing documents, and performing ceremonies."
           period={panchang.abhijit_muhurat}
-          icon="☀️"
+          icon={<Sparkles className="h-4 w-4" />}
         />
 
         {/* Brahma Muhurat */}
@@ -66,18 +80,18 @@ export const AuspiciousTimesCard: React.FC<AuspiciousTimesCardProps> = ({ pancha
           label="Brahma Muhurat"
           description="Sacred pre-dawn period ideal for meditation, study, and spiritual practices. Considered the best time for yoga and prayers."
           period={panchang.brahma_muhurat}
-          icon="🌅"
+          icon={<Sunrise className="h-4 w-4" />}
         />
       </div>
 
       {/* Info Note */}
-      <div className="mt-6 p-4 bg-blue-50 dark:bg-blue-500/10 border-l-4 border-blue-400 dark:border-blue-500 rounded-lg shadow-sm">
-        <p className="text-sm text-blue-900 dark:text-blue-200 leading-relaxed">
-          <strong className="text-blue-800 dark:text-blue-300">✨ Sacred Timing:</strong> These muhurat periods are traditionally considered
-          highly auspicious for important activities, spiritual practices, and beginning
-          new endeavors according to Vedic tradition.
+      <div className="mt-3 p-3 bg-blue-500/10 border-l-4 border-blue-400/60 rounded-lg">
+        <p className="text-xs text-blue-200 leading-relaxed">
+          <strong className="text-blue-300">✨ Sacred Timing:</strong> These periods are
+          highly auspicious for important activities according to Vedic tradition.
         </p>
       </div>
-    </Card>
+      </Card>
+    </motion.div>
   );
 };

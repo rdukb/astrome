@@ -4,6 +4,7 @@
  */
 
 import dayjs from 'dayjs';
+import { Calendar, ChevronLeft, ChevronRight } from 'lucide-react';
 import React from 'react';
 
 interface DateSelectorProps {
@@ -33,79 +34,43 @@ export const DateSelector: React.FC<DateSelectorProps> = ({
     onDateChange(e.target.value);
   };
 
-  const isToday = selectedDate === dayjs().format('YYYY-MM-DD');
   const displayDate = dayjs(selectedDate).format('dddd, MMMM D, YYYY');
 
   return (
-    <div className="bg-white dark:bg-dark-card rounded-xl shadow-lg p-5 border border-gray-200 dark:border-dark-border backdrop-blur-sm">
-      <div className="flex items-center justify-between gap-4">
-        {/* Previous Day Button */}
-        <button
-          onClick={handlePrevDay}
-          className="p-3 rounded-xl hover:bg-purple-100 dark:hover:bg-purple-500/20 hover:scale-110 transition-all duration-200 shadow-sm bg-gray-100 dark:bg-dark-border/30"
-          aria-label="Previous day"
-        >
-          <svg
-            className="w-6 h-6 text-purple-600 dark:text-purple-400"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2.5}
-              d="M15 19l-7-7 7-7"
-            />
-          </svg>
-        </button>
+    <div className="flex items-center gap-2 rounded-full border border-slate-700/50 bg-slate-800/60 px-3 py-2 backdrop-blur-md">
+      <button
+        onClick={handlePrevDay}
+        className="rounded-md p-1 text-slate-300 transition-colors hover:bg-slate-700/50 hover:text-slate-100"
+        aria-label="Previous day"
+      >
+        <ChevronLeft className="h-4 w-4" />
+      </button>
 
-        {/* Date Display and Input */}
-        <div className="flex-1 text-center">
-          <div className="text-xl font-bold text-gray-900 dark:text-dark-text-primary mb-2">
-            {displayDate}
-          </div>
-          <input
-            type="date"
-            value={selectedDate}
-            onChange={handleDateInput}
-            className="text-sm text-gray-900 dark:text-dark-text-primary bg-gray-100 dark:bg-dark-border/30 px-3 py-1.5 rounded-lg border-2 border-gray-200 dark:border-dark-border hover:border-purple-400 focus:border-purple-500 focus:outline-none focus:ring-2 focus:ring-purple-500/20 text-center cursor-pointer transition-colors shadow-sm"
-          />
-        </div>
-
-        {/* Next Day Button */}
+      <div className="flex min-w-0 items-center gap-2">
+        <Calendar className="h-4 w-4 shrink-0 text-amber-400" />
+        <span className="max-w-[18rem] truncate text-sm font-medium text-slate-200">{displayDate}</span>
+        <input
+          type="date"
+          value={selectedDate}
+          onChange={handleDateInput}
+          className="cursor-pointer rounded-md border border-slate-600/60 bg-slate-700/40 px-2 py-1 text-xs text-slate-100 transition-colors hover:border-cyan-500/40 focus:border-cyan-500 focus:outline-none focus:ring-2 focus:ring-cyan-500/20"
+          aria-label="Select date"
+        />
         <button
-          onClick={handleNextDay}
-          className="p-3 rounded-xl hover:bg-purple-100 dark:hover:bg-purple-500/20 hover:scale-110 transition-all duration-200 shadow-sm bg-gray-100 dark:bg-dark-border/30"
-          aria-label="Next day"
+          onClick={handleToday}
+          className="rounded-md border border-cyan-500/40 bg-cyan-500/20 px-2 py-1 text-xs font-medium text-cyan-200 transition-colors hover:bg-cyan-500/30"
         >
-          <svg
-            className="w-6 h-6 text-purple-600 dark:text-purple-400"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2.5}
-              d="M9 5l7 7-7 7"
-            />
-          </svg>
+          Today
         </button>
       </div>
 
-      {/* Today Button */}
-      {!isToday && (
-        <div className="mt-4 text-center">
-          <button
-            onClick={handleToday}
-            className="px-6 py-2.5 bg-gradient-to-r from-purple-500 to-purple-600 text-white font-semibold rounded-xl hover:from-purple-600 hover:to-purple-700 transition-all duration-200 shadow-md hover:shadow-lg hover:scale-105"
-          >
-            📅 Jump to Today
-          </button>
-        </div>
-      )}
+      <button
+        onClick={handleNextDay}
+        className="rounded-md p-1 text-slate-300 transition-colors hover:bg-slate-700/50 hover:text-slate-100"
+        aria-label="Next day"
+      >
+        <ChevronRight className="h-4 w-4" />
+      </button>
     </div>
   );
 };

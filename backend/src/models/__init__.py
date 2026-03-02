@@ -23,6 +23,7 @@ from .panchang import (
     TAMIL_MONTHS,
 )
 from .location import Location, LocationSearchRequest, LocationNearbyRequest
+from .definition import TermDefinition, DefinitionsListResponse
 
 __all__ = [
     # Base models
@@ -41,6 +42,9 @@ __all__ = [
     "Location",
     "LocationSearchRequest",
     "LocationNearbyRequest",
+    # Definition models
+    "TermDefinition",
+    "DefinitionsListResponse",
     # Constants
     "TITHI_NAMES",
     "NAKSHATRA_NAMES",

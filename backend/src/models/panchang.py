@@ -329,7 +329,7 @@ class DailyPanchang(BaseModel):
 
     id: UUID = Field(default_factory=uuid4, description="Unique identifier")
     date: str = Field(..., description="Calendar date (YYYY-MM-DD)")
-    location_id: UUID = Field(..., description="Location identifier")
+    location_id: str = Field(..., description="Location identifier")
     timezone: str = Field(..., description="IANA timezone identifier")
 
     # Sun and Moon times

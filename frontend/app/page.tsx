@@ -5,8 +5,7 @@
 
 'use client';
 
-import { ThemeSwitcher } from '@/components/layout/ThemeSwitcher';
-import { LocationDisplay } from '@/components/location/LocationDisplay';
+import { LocationPicker } from '@/components/location/LocationPicker';
 import { AuspiciousTimesCard } from '@/components/panchang/AuspiciousTimesCard';
 import { DateSelector } from '@/components/panchang/DateSelector';
 import { InauspiciousTimesCard } from '@/components/panchang/InauspiciousTimesCard';
@@ -15,6 +14,8 @@ import { PanchangSkeleton } from '@/components/panchang/PanchangSkeleton';
 import { SunTimesCard } from '@/components/panchang/SunTimesCard';
 import { useGeolocation } from '@/hooks/useGeolocation';
 import { usePanchangStore } from '@/stores/panchang-store';
+import type { Location } from '@/types/location';
+import { motion } from 'motion/react';
 import { useEffect, useState } from 'react';
 
 export default function PanchangPage() {
@@ -25,6 +26,7 @@ export default function PanchangPage() {
     isLoading,
     error,
     setSelectedDate,
+    setSelectedLocation,
     loadPanchang,
     clearCache,
   } = usePanchangStore();
@@ -32,6 +34,7 @@ export default function PanchangPage() {
   const { coordinates, loading: geoLoading, requestLocation } = useGeolocation();
   const [hasRequestedLocation, setHasRequestedLocation] = useState(false);
   const [isClearingCache, setIsClearingCache] = useState(false);
+  const [pendingUseCurrent, setPendingUseCurrent] = useState(false);
 
   // Request geolocation on mount if no location is set
   useEffect(() => {
@@ -66,8 +69,37 @@ export default function PanchangPage() {
     }
   }, [selectedDate, selectedLocation, coordinates, loadPanchang]);
 
+  useEffect(() => {
+    if (!pendingUseCurrent || !coordinates) return;
+
+    const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    setSelectedLocation({
+      id: `current-${coordinates.latitude.toFixed(4)}-${coordinates.longitude.toFixed(4)}`,
+      name: 'Current Location',
+      display_name: `Current Location (${coordinates.latitude.toFixed(3)}, ${coordinates.longitude.toFixed(3)})`,
+      latitude: coordinates.latitude,
+      longitude: coordinates.longitude,
+      timezone,
+      country: 'Unknown',
+      state: null,
+      is_favorite: false,
+      created_at: new Date().toISOString(),
+      last_accessed: new Date().toISOString(),
+    });
+    setPendingUseCurrent(false);
+  }, [pendingUseCurrent, coordinates, setSelectedLocation]);
+
   const handleDateChange = (newDate: string) => {
     setSelectedDate(newDate);
+  };
+
+  const handleSelectLocation = (location: Location) => {
+    setSelectedLocation(location);
+  };
+
+  const handleUseCurrentLocation = () => {
+    setPendingUseCurrent(true);
+    requestLocation();
   };
 
   const handleClearCache = async () => {
@@ -92,13 +124,13 @@ export default function PanchangPage() {
   // Show loading skeleton
   if ((isLoading || geoLoading) && !currentPanchang) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gradient-to-br dark:from-indigo-950 dark:via-purple-950 dark:to-slate-900 py-6 px-4 sm:py-8 sm:px-6 lg:px-8">
+      <div className="min-h-screen bg-gradient-to-br from-indigo-950 via-purple-950 to-slate-900 py-6 px-4 sm:py-8 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           <header className="mb-8 text-center">
-            <h1 className="text-4xl sm:text-5xl font-bold text-gray-900 dark:text-transparent dark:bg-clip-text dark:bg-gradient-to-r dark:from-purple-400 dark:to-pink-400 mb-2">
+            <h1 className="text-4xl sm:text-5xl font-bold text-white mb-2">
               Tamil Panchangam
             </h1>
-            <p className="mt-3 text-base sm:text-lg text-gray-600 dark:text-dark-text-secondary font-medium">
+            <p className="mt-3 text-base sm:text-lg text-slate-300 font-medium">
               Loading today&apos;s almanac...
             </p>
           </header>
@@ -111,10 +143,10 @@ export default function PanchangPage() {
   // Show error state
   if (error && !currentPanchang) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gradient-to-br dark:from-indigo-950 dark:via-purple-950 dark:to-slate-900 py-8 px-4 sm:px-6 lg:px-8">
+      <div className="min-h-screen bg-gradient-to-br from-indigo-950 via-purple-950 to-slate-900 py-8 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           <header className="mb-8">
-            <h1 className="text-4xl font-bold text-gray-900 dark:text-dark-text-primary text-center">
+            <h1 className="text-4xl font-bold text-white text-center">
               Tamil Panchangam
             </h1>
           </header>
@@ -133,10 +165,10 @@ export default function PanchangPage() {
                   d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
                 />
               </svg>
-              <h2 className="text-xl font-semibold text-dark-text-primary">Error Loading Panchang</h2>
+              <h2 className="text-xl font-semibold text-slate-100">Error Loading Panchang</h2>
             </div>
             <p className="text-red-300 mb-4">{error}</p>
-            <div className="text-sm text-dark-text-secondary mb-4">
+            <div className="text-sm text-slate-300 mb-4">
               <p>Backend URL: {process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}</p>
               <p>Make sure the backend server is running on port 8000</p>
             </div>
@@ -152,7 +184,7 @@ export default function PanchangPage() {
                   });
                 }
               }}
-              className="px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition-colors"
+              className="px-4 py-2 bg-slate-800/70 text-white rounded-lg hover:bg-slate-700/80 transition-colors border border-slate-600/60"
             >
               Retry
             </button>
@@ -165,16 +197,16 @@ export default function PanchangPage() {
   // Show location request if needed
   if (!coordinates && !selectedLocation && !geoLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
+      <div className="min-h-screen bg-gradient-to-br from-indigo-950 via-purple-950 to-slate-900 py-8 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           <header className="mb-8">
-            <h1 className="text-4xl font-bold text-gray-900 text-center">
+            <h1 className="text-4xl font-bold text-white text-center">
               Tamil Panchangam
             </h1>
           </header>
-          <div className="bg-blue-950/30 border border-blue-800/50 rounded-lg p-8 text-center max-w-md mx-auto backdrop-blur-sm">
+          <div className="bg-slate-800/60 border border-slate-700/50 rounded-lg p-8 text-center max-w-md mx-auto backdrop-blur-lg">
             <svg
-              className="w-16 h-16 mx-auto mb-4 text-blue-400"
+              className="w-16 h-16 mx-auto mb-4 text-cyan-400"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -192,15 +224,15 @@ export default function PanchangPage() {
                 d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
               />
             </svg>
-            <h2 className="text-xl font-semibold text-dark-text-primary mb-2">
+            <h2 className="text-xl font-semibold text-slate-100 mb-2">
               Location Access Required
             </h2>
-            <p className="text-dark-text-secondary mb-6">
+            <p className="text-slate-300 mb-6">
               We need your location to calculate accurate Panchang times for your area.
             </p>
             <button
               onClick={requestLocation}
-              className="px-6 py-3 bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition-colors font-medium"
+              className="px-6 py-3 bg-cyan-500/20 text-cyan-200 rounded-lg hover:bg-cyan-500/30 transition-colors font-medium border border-cyan-500/40"
             >
               Enable Location
             </button>
@@ -212,57 +244,79 @@ export default function PanchangPage() {
 
   // Main content
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gradient-to-br dark:from-indigo-950 dark:via-purple-950 dark:to-slate-900 py-6 px-4 sm:py-8 sm:px-6 lg:px-8">
-      <div className="max-w-7xl mx-auto">
+    <div className="min-h-screen bg-gradient-to-br from-indigo-950 via-purple-950 to-slate-900 overflow-y-auto py-6 px-4 sm:py-8 sm:px-6 lg:px-8">
+      <div className="fixed inset-0 overflow-hidden pointer-events-none">
+        <motion.div
+          className="absolute top-20 left-20 h-96 w-96 rounded-full bg-purple-500/10 blur-3xl"
+          animate={{ scale: [1, 1.2, 1], opacity: [0.2, 0.3, 0.2] }}
+          transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut' }}
+        />
+        <motion.div
+          className="absolute bottom-20 right-20 h-96 w-96 rounded-full bg-indigo-500/10 blur-3xl"
+          animate={{ scale: [1.2, 1, 1.2], opacity: [0.3, 0.2, 0.3] }}
+          transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut' }}
+        />
+      </div>
+      <div className="relative z-10 max-w-[1600px] mx-auto">
         {/* Header */}
-        <header className="mb-8 text-center">
-          <h1 className="text-4xl sm:text-5xl font-bold text-gray-900 dark:text-transparent dark:bg-clip-text dark:bg-gradient-to-r dark:from-purple-400 dark:to-pink-400 mb-2">
+        <motion.header
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          className="mb-6 text-center"
+        >
+          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white mb-2">
             Tamil Panchangam
           </h1>
-          <p className="mt-3 text-base sm:text-lg text-gray-600 dark:text-dark-text-secondary font-medium">
+          <p className="mt-3 text-base sm:text-lg text-slate-300 font-medium">
             Daily Vedic Almanac for Auspicious Timing
           </p>
           <div className="mt-4">
             <button
               onClick={handleClearCache}
               disabled={isClearingCache}
-              className="inline-flex items-center rounded-lg border border-gray-300 bg-white/80 px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-60 dark:border-slate-700 dark:bg-slate-900/60 dark:text-slate-200 dark:hover:bg-slate-800"
+              className="inline-flex items-center rounded-lg border border-slate-700/60 bg-slate-900/60 px-4 py-2 text-sm font-medium text-slate-200 transition-colors hover:bg-slate-800/70 disabled:cursor-not-allowed disabled:opacity-60"
             >
               {isClearingCache ? 'Clearing Cache...' : 'Clear Cache & Refresh'}
             </button>
           </div>
-        </header>
+        </motion.header>
 
         {/* Location and Date */}
-        <div className="space-y-4 sm:space-y-5 mb-6 sm:mb-8">
-          <LocationDisplay
-            location={selectedLocation}
-            coordinates={coordinates}
-            timezone={selectedLocation?.timezone || Intl.DateTimeFormat().resolvedOptions().timeZone}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.5, delay: 0.2 }}
+          className="mb-6 flex flex-wrap items-center justify-center gap-4"
+        >
+          <LocationPicker
+            selectedLocation={selectedLocation}
+            onSelectLocation={handleSelectLocation}
+            onUseCurrentLocation={handleUseCurrentLocation}
           />
           <DateSelector
             selectedDate={selectedDate}
             onDateChange={handleDateChange}
           />
-        </div>
+        </motion.div>
 
         {/* Panchang Content */}
         {currentPanchang && (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 sm:gap-6">
-            <div className="space-y-5 sm:space-y-6">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 lg:gap-5">
+            <div className="space-y-4 lg:space-y-5">
               <PanchangCard panchang={currentPanchang} />
-              <SunTimesCard panchang={currentPanchang} />
             </div>
-            <div className="space-y-5 sm:space-y-6">
-              <InauspiciousTimesCard panchang={currentPanchang} />
+            <div className="space-y-4 lg:space-y-5">
+              <SunTimesCard panchang={currentPanchang} />
               <AuspiciousTimesCard panchang={currentPanchang} />
+            </div>
+            <div className="space-y-4 lg:space-y-5">
+              <InauspiciousTimesCard panchang={currentPanchang} />
             </div>
           </div>
         )}
       </div>
 
-      {/* Theme Switcher */}
-      <ThemeSwitcher />
     </div>
   );
 }

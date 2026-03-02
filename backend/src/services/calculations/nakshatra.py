@@ -43,16 +43,16 @@ NAKSHATRA_DEITIES = {
 }
 
 
-def calculate_nakshatra(julian_day: float, timezone_offset_hours: float = 0) -> NakshatraInfo:
+def calculate_nakshatra(julian_day: float, sunrise_jd: float) -> NakshatraInfo:
     """
-    Calculate Nakshatra for given Julian Day
+    Calculate Nakshatra for given Julian Day.
 
     Args:
-        julian_day: Julian Day Number (UTC)
-        timezone_offset_hours: Timezone offset for sunrise check
+        julian_day: Julian Day Number (UTC midnight of the calculation date)
+        sunrise_jd: Actual sunrise Julian Day from sun.py (used for at_sunrise flag)
 
     Returns:
-        NakshatraInfo with number, name, pada, deity, start/end times
+        NakshatraInfo with number, name, pada, deity, start/end times and at_sunrise flag
     """
     # Set sidereal mode with Lahiri ayanamsa
     swe.set_sid_mode(swe.SIDM_LAHIRI)
@@ -77,12 +77,11 @@ def calculate_nakshatra(julian_day: float, timezone_offset_hours: float = 0) -> 
     if pada > 4:
         pada = 4
 
-    # Find Nakshatra start and end times
+    # Find Nakshatra start and end times using bisection for ~1-minute precision
     nakshatra_start_jd = find_nakshatra_start(julian_day, nakshatra_num, ayanamsa)
     nakshatra_end_jd = find_nakshatra_end(julian_day, nakshatra_num, ayanamsa)
 
-    # Check if Nakshatra is prevailing at sunrise
-    sunrise_jd = julian_day + (6.0 / 24.0) + (timezone_offset_hours / 24.0)
+    # at_sunrise: use the real sunrise_jd passed in (not a crude 6 AM estimate)
     at_sunrise = nakshatra_start_jd <= sunrise_jd < nakshatra_end_jd
 
     return NakshatraInfo(
@@ -97,40 +96,77 @@ def calculate_nakshatra(julian_day: float, timezone_offset_hours: float = 0) -> 
     )
 
 
+def _get_moon_longitude_sidereal(julian_day: float, ayanamsa: float) -> float:
+    """Return sidereal Moon longitude at given Julian Day."""
+    moon_data, _ = swe.calc_ut(julian_day, swe.MOON)
+    return (moon_data[0] - ayanamsa) % 360
+
+
+def _bisect_moon_longitude(
+    target: float, lo_jd: float, hi_jd: float, ayanamsa: float, tolerance_deg: float = 0.0042
+) -> float:
+    """
+    Binary-search for the Julian Day when sidereal Moon longitude crosses ``target``.
+
+    tolerance_deg defaults to 0.0042° ≈ 1 arc-minute (Moon moves ~0.5°/hr).
+    """
+    for _ in range(50):
+        mid_jd = (lo_jd + hi_jd) / 2.0
+        if (hi_jd - lo_jd) * 24 * 60 < 1.0:  # bracket < 1 minute → done
+            return mid_jd
+        mid_lon = _get_moon_longitude_sidereal(mid_jd, ayanamsa)
+        diff = (mid_lon - target + 180) % 360 - 180
+        if abs(diff) < tolerance_deg:
+            return mid_jd
+        lo_lon = _get_moon_longitude_sidereal(lo_jd, ayanamsa)
+        lo_diff = (lo_lon - target + 180) % 360 - 180
+        if lo_diff * diff <= 0:
+            hi_jd = mid_jd
+        else:
+            lo_jd = mid_jd
+    return (lo_jd + hi_jd) / 2.0
+
+
 def find_nakshatra_start(reference_jd: float, nakshatra_num: int, ayanamsa: float) -> float:
-    """Find when Nakshatra starts"""
-    target_longitude = (nakshatra_num - 1) * (360 / 27)
+    """
+    Find when Nakshatra starts using coarse bracket + bisection (~1-minute precision).
+    """
+    target_longitude = (nakshatra_num - 1) * (360.0 / 27)
 
-    jd = reference_jd - 1.0
-    for _ in range(30):
-        moon_data, _ = swe.calc_ut(jd, swe.MOON)
-
-        moon_long = moon_data[0]
-        moon_sidereal = (moon_long - ayanamsa) % 360
-
-        if abs(moon_sidereal - target_longitude) < 0.1:
-            return jd
-        jd -= 0.02
+    step = 0.5 / 24  # 30-minute steps
+    jd = reference_jd - step
+    prev_jd = reference_jd
+    for _ in range(96):  # up to 2 days back
+        lon = _get_moon_longitude_sidereal(jd, ayanamsa)
+        prev_lon = _get_moon_longitude_sidereal(prev_jd, ayanamsa)
+        diff = (lon - target_longitude + 180) % 360 - 180
+        prev_diff = (prev_lon - target_longitude + 180) % 360 - 180
+        if diff * prev_diff <= 0:
+            return _bisect_moon_longitude(target_longitude, jd, prev_jd, ayanamsa)
+        prev_jd = jd
+        jd -= step
 
     return reference_jd - 0.5
 
 
 def find_nakshatra_end(reference_jd: float, nakshatra_num: int, ayanamsa: float) -> float:
-    """Find when Nakshatra ends"""
-    target_longitude = nakshatra_num * (360 / 27)
-    if target_longitude >= 360:
-        target_longitude = 0
+    """
+    Find when Nakshatra ends using coarse bracket + bisection (~1-minute precision).
+    """
+    target_longitude = (nakshatra_num * (360.0 / 27)) % 360
 
-    jd = reference_jd
-    for _ in range(30):
-        moon_data, _ = swe.calc_ut(jd, swe.MOON)
-
-        moon_long = moon_data[0]
-        moon_sidereal = (moon_long - ayanamsa) % 360
-
-        if abs(moon_sidereal - target_longitude) < 0.1:
-            return jd
-        jd += 0.02
+    step = 0.5 / 24  # 30-minute steps
+    prev_jd = reference_jd
+    jd = reference_jd + step
+    for _ in range(96):  # up to 2 days ahead
+        lon = _get_moon_longitude_sidereal(jd, ayanamsa)
+        prev_lon = _get_moon_longitude_sidereal(prev_jd, ayanamsa)
+        diff = (lon - target_longitude + 180) % 360 - 180
+        prev_diff = (prev_lon - target_longitude + 180) % 360 - 180
+        if prev_diff * diff <= 0:
+            return _bisect_moon_longitude(target_longitude, prev_jd, jd, ayanamsa)
+        prev_jd = jd
+        jd += step
 
     return reference_jd + 1.0
 

@@ -17,6 +17,7 @@ from fastapi.responses import JSONResponse
 from src.api.middleware import add_error_handlers
 from src.config import get_settings, setup_logging
 from src.config.logging import get_logger
+from src.data.load_definitions import load_term_definitions
 
 # Initialize settings and logging
 settings = get_settings()
@@ -46,11 +47,24 @@ async def lifespan(app: FastAPI):
 
     # Initialize database (create tables if not exist)
     try:
-        from src.db import engine
+        from src.db import SessionLocal, engine
         from src.db.schema import Base
 
         Base.metadata.create_all(bind=engine)
         logger.info("Database tables initialized")
+
+        # Seed/refresh definitions from bundled JSON.
+        db = SessionLocal()
+        try:
+            sync_result = load_term_definitions(db)
+            logger.info(
+                "Term definitions synchronized: total=%s inserted=%s updated=%s",
+                sync_result["total"],
+                sync_result["inserted"],
+                sync_result["updated"],
+            )
+        finally:
+            db.close()
     except Exception as e:
         logger.error(f"Database initialization failed: {e}")
 
@@ -86,8 +100,10 @@ add_error_handlers(app)
 
 # Mount API routes
 from src.api.routes.panchang import router as panchang_router
+from src.api.routes.definitions import router as definitions_router
 
 app.include_router(panchang_router)
+app.include_router(definitions_router)
 
 
 # Health check endpoint

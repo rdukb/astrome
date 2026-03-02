@@ -10,9 +10,10 @@
 'use client';
 
 import { ThemeProvider } from '@/contexts/ThemeContext';
+import { useDefinitionsStore } from '@/stores/definitions-store';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
-import { ReactNode, useState } from 'react';
+import { ReactNode, useEffect, useState } from 'react';
 
 interface ProvidersProps {
   children: ReactNode;
@@ -43,6 +44,10 @@ export function Providers({ children }: ProvidersProps) {
         },
       })
   );
+
+  useEffect(() => {
+    void useDefinitionsStore.getState().preloadDefinitions('both');
+  }, []);
 
   return (
     <ThemeProvider>

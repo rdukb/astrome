@@ -126,7 +126,7 @@
 
 - [X] T070a [P] [US1] Implement dark theme with deep blue/purple gradient background in frontend/app/globals.css and page.tsx
 - [X] T070b [P] [US1] Update Tailwind config with dark theme color palette (indigo-950, purple-950, slate-800) in frontend/tailwind.config.js
-- [ ] T070c [US1] Redesign card layout for horizontal stacking - merge Sun/Moon times into single compact card, use 2-column grid on desktop
+- [X] T070c [US1] Redesign card layout for horizontal stacking - merge Sun/Moon times into single compact card, use 2-column grid on desktop
 - [X] T070d [P] [US1] Update all card components with dark theme styling - dark backgrounds, light text, vibrant accent colors
 - [X] T070e [P] [US1] Add theme switcher widget (system/light/dark) with floating button interface in top-right corner
 - [X] T070f [P] [US1] Fix font loading - add Inter font from Google Fonts, remove Times New Roman fallback
@@ -193,19 +193,19 @@
 
 ### Backend Implementation for User Story 2
 
-- [ ] T073 [P] [US2] Create TermDefinition Pydantic model in backend/src/models/definition.py per data-model.md
-- [ ] T074 [US2] Implement data loader for term definitions in backend/src/data/load_definitions.py reading JSON to SQLite
-- [ ] T075 [US2] Create GET /api/v1/definitions endpoint in backend/src/api/routes/definitions.py returning all 20 terms per panchang-api.yaml
-- [ ] T076 [P] [US2] Create GET /api/v1/definitions/{term_id} endpoint in backend/src/api/routes/definitions.py per panchang-api.yaml
-- [ ] T077 [US2] Add caching headers (Cache-Control: max-age=2592000) to definitions endpoints for 30-day browser cache
+- [X] T073 [P] [US2] Create TermDefinition Pydantic model in backend/src/models/definition.py per data-model.md
+- [X] T074 [US2] Implement data loader for term definitions in backend/src/data/load_definitions.py reading JSON to SQLite
+- [X] T075 [US2] Create GET /api/v1/definitions endpoint in backend/src/api/routes/definitions.py returning all 20 terms per panchang-api.yaml
+- [X] T076 [P] [US2] Create GET /api/v1/definitions/{term_id} endpoint in backend/src/api/routes/definitions.py per panchang-api.yaml
+- [X] T077 [US2] Add caching headers (Cache-Control: max-age=2592000) to definitions endpoints for 30-day browser cache
 
 ### Frontend Implementation for User Story 2
 
-- [ ] T078 [P] [US2] Create TermDefinition TypeScript interface in frontend/types/definition.ts matching API schema
-- [ ] T079 [P] [US2] Create API service function fetchDefinitions in frontend/services/definitions-api.ts
-- [ ] T080 [P] [US2] Create API service function fetchDefinition in frontend/services/definitions-api.ts for individual terms
-- [ ] T081 [US2] Create definitions Zustand store in frontend/stores/definitions-store.ts with definitions map, loading state
-- [ ] T082 [US2] Implement preloadDefinitions action in frontend/stores/definitions-store.ts called on app initialization
+- [X] T078 [P] [US2] Create TermDefinition TypeScript interface in frontend/types/definition.ts matching API schema
+- [X] T079 [P] [US2] Create API service function fetchDefinitions in frontend/services/definitions-api.ts
+- [X] T080 [P] [US2] Create API service function fetchDefinition in frontend/services/definitions-api.ts for individual terms
+- [X] T081 [US2] Create definitions Zustand store in frontend/stores/definitions-store.ts with definitions map, loading state
+- [X] T082 [US2] Implement preloadDefinitions action in frontend/stores/definitions-store.ts called on app initialization
 - [ ] T083 [US2] Create Tooltip component in frontend/components/ui/Tooltip.tsx with hover/tap interactions, positioning logic
 - [ ] T084 [US2] Create TermTooltip component in frontend/components/definitions/TermTooltip.tsx wrapping term text with Tooltip, showing definition
 - [ ] T085 [US2] Create DefinitionModal component in frontend/components/definitions/DefinitionModal.tsx for detailed explanation, related terms

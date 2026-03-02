@@ -107,7 +107,7 @@ class PanchangCalculator:
         panchang = DailyPanchang(
             id=uuid4(),
             date=calculation_date.isoformat(),
-            location_id=uuid4() if not location_id else location_id,
+            location_id=str(uuid4()) if not location_id else location_id,
             timezone=timezone,
             # Sun and Moon times
             sunrise=sun_times["sunrise"],
