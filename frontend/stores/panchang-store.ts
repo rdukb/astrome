@@ -66,7 +66,7 @@ const getTodayString = (): string => {
   return `${year}-${month}-${day}`;
 };
 
-const CACHE_KEY_VERSION = 'v2';
+const CACHE_KEY_VERSION = 'v3';
 
 /**
  * Create cache key for Panchang data
@@ -207,14 +207,14 @@ export const usePanchangStore = create<PanchangState>()(
       {
         name: 'panchang-store',
         storage: createJSONStorage(() => localStorage),
-        version: 4,
+        version: 5,
         migrate: (persistedState: unknown) => {
           const state = (persistedState as Partial<PanchangState>) || {};
           return {
             ...state,
             // Always normalize to local "today" on hydration to avoid stale UTC-shifted dates.
             selectedDate: getTodayString(),
-            // Invalidate stale cached timings after calculation logic updates.
+            // Invalidate stale cached timings after calculation logic updates (v3 cache keys).
             cache: {},
           } as PanchangState;
         },
