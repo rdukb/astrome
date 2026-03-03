@@ -1,4 +1,8 @@
-# Astrome - Tamil Panchangam Web Application
+<div align="center">
+  <img width="1200" height="380" alt="Astrome — Tamil Panchangam Vedic Almanac" src="./docs/banner.svg" />
+</div>
+
+<br/>
 
 **Version**: 1.0.0
 **License**: AGPL-3.0

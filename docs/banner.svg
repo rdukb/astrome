@@ -1,0 +1,171 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="380" viewBox="0 0 1200 380">
+  <defs>
+    <radialGradient id="sunGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#fbbf24" stop-opacity="0.6"/>
+      <stop offset="100%" stop-color="#f59e0b" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="bgGrad" cx="30%" cy="40%" r="70%">
+      <stop offset="0%" stop-color="#0f1640"/>
+      <stop offset="100%" stop-color="#050810"/>
+    </radialGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="4" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <filter id="softGlow">
+      <feGaussianBlur stdDeviation="8" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <clipPath id="roundedClip">
+      <rect width="1200" height="380" rx="16" ry="16"/>
+    </clipPath>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="380" fill="url(#bgGrad)" rx="16" ry="16"/>
+
+  <!-- Subtle grid lines -->
+  <g opacity="0.04" stroke="#6366f1" stroke-width="1">
+    <line x1="0" y1="95" x2="1200" y2="95"/>
+    <line x1="0" y1="190" x2="1200" y2="190"/>
+    <line x1="0" y1="285" x2="1200" y2="285"/>
+    <line x1="300" y1="0" x2="300" y2="380"/>
+    <line x1="600" y1="0" x2="600" y2="380"/>
+    <line x1="900" y1="0" x2="900" y2="380"/>
+  </g>
+
+  <!-- Stars scattered -->
+  <g fill="#ffffff">
+    <circle cx="320" cy="38" r="1.5" opacity="0.8"/>
+    <circle cx="480" cy="22" r="1" opacity="0.6"/>
+    <circle cx="560" cy="55" r="2" opacity="0.5"/>
+    <circle cx="700" cy="30" r="1.5" opacity="0.7"/>
+    <circle cx="820" cy="48" r="1" opacity="0.6"/>
+    <circle cx="920" cy="25" r="2" opacity="0.5"/>
+    <circle cx="1020" cy="42" r="1.5" opacity="0.8"/>
+    <circle cx="1120" cy="18" r="1" opacity="0.6"/>
+    <circle cx="1060" cy="68" r="1.5" opacity="0.5"/>
+    <circle cx="420" cy="70" r="1" opacity="0.7"/>
+    <circle cx="760" cy="62" r="1.5" opacity="0.6"/>
+    <circle cx="1150" cy="55" r="2" opacity="0.4"/>
+  </g>
+  <!-- Amber/purple tinted stars -->
+  <circle cx="380" cy="50" r="2" fill="#fbbf24" opacity="0.5"/>
+  <circle cx="850" cy="35" r="2" fill="#c084fc" opacity="0.5"/>
+  <circle cx="1080" cy="30" r="1.5" fill="#fbbf24" opacity="0.4"/>
+  <circle cx="640" cy="40" r="1.5" fill="#c084fc" opacity="0.5"/>
+
+  <!-- Sun glow halo -->
+  <circle cx="138" cy="155" r="100" fill="url(#sunGlow)"/>
+
+  <!-- Sun rays -->
+  <g stroke="#fbbf24" stroke-width="4" stroke-linecap="round" opacity="0.85" filter="url(#glow)">
+    <line x1="138" y1="88"  x2="138" y2="70"/>
+    <line x1="172" y1="97"  x2="183" y2="83"/>
+    <line x1="190" y1="131" x2="208" y2="126"/>
+    <line x1="183" y1="167" x2="200" y2="176"/>
+    <line x1="165" y1="194" x2="174" y2="210"/>
+    <line x1="138" y1="202" x2="138" y2="220"/>
+    <line x1="111" y1="194" x2="102" y2="210"/>
+    <line x1="93"  y1="167" x2="76"  y2="176"/>
+    <line x1="86"  y1="131" x2="68"  y2="126"/>
+    <line x1="93"  y1="97"  x2="83"  y2="83"/>
+    <line x1="111" y1="88"  x2="102" y2="74"/>
+    <line x1="165" y1="88"  x2="174" y2="74"/>
+  </g>
+
+  <!-- Sun body -->
+  <circle cx="138" cy="155" r="50" fill="#f59e0b" filter="url(#glow)"/>
+  <circle cx="138" cy="155" r="42" fill="#fbbf24"/>
+  <circle cx="138" cy="155" r="34" fill="#fde68a"/>
+
+  <!-- Moon -->
+  <circle cx="218" cy="102" r="38" fill="#c084fc" filter="url(#glow)" opacity="0.9"/>
+  <circle cx="235" cy="95"  r="36" fill="#0f1640"/>
+
+  <!-- Crescent inner glow -->
+  <circle cx="213" cy="106" r="30" fill="none" stroke="#e9d5ff" stroke-width="1" opacity="0.3"/>
+
+  <!-- Right side decorative constellation dots -->
+  <g fill="#6366f1" opacity="0.4">
+    <circle cx="1050" cy="120" r="3"/>
+    <circle cx="1090" cy="100" r="2"/>
+    <circle cx="1130" cy="125" r="3"/>
+    <circle cx="1100" cy="150" r="2"/>
+    <line x1="1050" y1="120" x2="1090" y2="100" stroke="#6366f1" stroke-width="1"/>
+    <line x1="1090" y1="100" x2="1130" y2="125" stroke="#6366f1" stroke-width="1"/>
+    <line x1="1130" y1="125" x2="1100" y2="150" stroke="#6366f1" stroke-width="1"/>
+  </g>
+
+  <!-- ASTROME title -->
+  <text x="600" y="148"
+    font-family="Georgia, 'Times New Roman', serif"
+    font-size="82"
+    font-weight="bold"
+    text-anchor="middle"
+    fill="#f59e0b"
+    filter="url(#softGlow)"
+    letter-spacing="12">ASTROME</text>
+
+  <!-- Tagline -->
+  <text x="600" y="192"
+    font-family="'Helvetica Neue', Arial, sans-serif"
+    font-size="20"
+    text-anchor="middle"
+    fill="#94a3b8"
+    letter-spacing="4">TAMIL PANCHANGAM  ·  VEDIC ALMANAC</text>
+
+  <!-- Divider line -->
+  <line x1="360" y1="212" x2="840" y2="212" stroke="#f59e0b" stroke-width="1" opacity="0.35"/>
+
+  <!-- Feature tagline -->
+  <text x="600" y="238"
+    font-family="'Helvetica Neue', Arial, sans-serif"
+    font-size="14"
+    text-anchor="middle"
+    fill="#475569"
+    letter-spacing="2">Swiss Ephemeris  ✦  Arc-minute precision  ✦  Location-aware calculations</text>
+
+  <!-- Tech pills -->
+  <!-- FastAPI -->
+  <rect x="290" y="262" width="108" height="30" rx="15" fill="#1e3a5f" stroke="#3b82f6" stroke-width="1.5"/>
+  <text x="344" y="282" font-family="'Helvetica Neue', Arial, sans-serif" font-size="13" text-anchor="middle" fill="#60a5fa" font-weight="500">FastAPI</text>
+
+  <!-- Next.js 16 -->
+  <rect x="410" y="262" width="130" height="30" rx="15" fill="#1e1b4b" stroke="#8b5cf6" stroke-width="1.5"/>
+  <text x="475" y="282" font-family="'Helvetica Neue', Arial, sans-serif" font-size="13" text-anchor="middle" fill="#a78bfa" font-weight="500">Next.js 16</text>
+
+  <!-- TypeScript -->
+  <rect x="552" y="262" width="130" height="30" rx="15" fill="#064e3b" stroke="#10b981" stroke-width="1.5"/>
+  <text x="617" y="282" font-family="'Helvetica Neue', Arial, sans-serif" font-size="13" text-anchor="middle" fill="#34d399" font-weight="500">TypeScript 5</text>
+
+  <!-- PWA-ready -->
+  <rect x="694" y="262" width="110" height="30" rx="15" fill="#451a03" stroke="#f59e0b" stroke-width="1.5"/>
+  <text x="749" y="282" font-family="'Helvetica Neue', Arial, sans-serif" font-size="13" text-anchor="middle" fill="#fbbf24" font-weight="500">PWA-ready</text>
+
+  <!-- AGPL-3.0 -->
+  <rect x="816" y="262" width="110" height="30" rx="15" fill="#1e1b4b" stroke="#8b5cf6" stroke-width="1.5"/>
+  <text x="871" y="282" font-family="'Helvetica Neue', Arial, sans-serif" font-size="13" text-anchor="middle" fill="#a78bfa" font-weight="500">AGPL-3.0</text>
+
+  <!-- Footer text -->
+  <text x="600" y="332"
+    font-family="'Helvetica Neue', Arial, sans-serif"
+    font-size="12"
+    text-anchor="middle"
+    fill="#334155"
+    letter-spacing="1">v1.0.0  ·  github.com/rdukb/astrome</text>
+
+  <!-- Bottom accent bar -->
+  <rect x="0" y="362" width="1200" height="18" rx="0" fill="#f59e0b" opacity="0.8"/>
+  <rect x="0" y="356" width="1200" height="6" rx="0" fill="#f59e0b" opacity="0.25"/>
+
+  <!-- Bottom corners round -->
+  <rect x="0" y="356" width="16" height="24" fill="url(#bgGrad)"/>
+  <rect x="1184" y="356" width="16" height="24" fill="url(#bgGrad)"/>
+</svg>
