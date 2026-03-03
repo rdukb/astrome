@@ -33,7 +33,7 @@ astrome/
 │   └── docs/         # API documentation
 │
 ├── frontend/         # Next.js React frontend
-│   ├── app/          # Next.js 14 App Router pages
+│   ├── app/          # Next.js 16 App Router pages
 │   ├── components/   # React components
 │   ├── hooks/        # Custom React hooks
 │   ├── services/     # API client
