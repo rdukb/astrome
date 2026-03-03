@@ -5,8 +5,8 @@ Calculates Rahu Kalam, Gulika Kalam, Yamaganda, and Durmuhurtam periods.
 Based on weekday and sunrise-sunset division.
 """
 
-from datetime import datetime, timezone
 from ...models import TimePeriod
+from .utils import julian_to_datetime
 
 
 def calculate_rahu_kalam(sunrise_jd: float, sunset_jd: float, weekday: int) -> TimePeriod:
@@ -182,13 +182,3 @@ def calculate_durmuhurtam(sunrise_jd: float, sunset_jd: float) -> list[TimePerio
     return periods
 
 
-def julian_to_datetime(julian_day: float) -> datetime:
-    """Convert Julian Day to Python datetime (UTC timezone-aware)"""
-    import swisseph as swe
-
-    year, month, day, hour = swe.revjul(julian_day)
-    hour_int = int(hour)
-    minute = int((hour - hour_int) * 60)
-    second = int(((hour - hour_int) * 60 - minute) * 60)
-
-    return datetime(int(year), int(month), int(day), hour_int, minute, second, tzinfo=timezone.utc)

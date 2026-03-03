@@ -29,14 +29,6 @@ const createApiClient = (): AxiosInstance => {
   // Request interceptor
   client.interceptors.request.use(
     (config) => {
-      // Add timestamp to prevent caching
-      if (config.method === 'get') {
-        config.params = {
-          ...config.params,
-          _t: Date.now(),
-        };
-      }
-
       // Log request in development
       if (process.env.NODE_ENV === 'development') {
         console.log(`[API] ${config.method?.toUpperCase()} ${config.url}`, config.params);

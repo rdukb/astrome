@@ -114,11 +114,11 @@ cp .env.local.example .env.local
 - **Server**: Uvicorn (ASGI)
 
 ### Frontend
-- **Framework**: Next.js 14 (App Router)
-- **Language**: TypeScript 5.3+
-- **UI Library**: React 18
-- **Styling**: Tailwind CSS 3.3+
-- **State Management**: Zustand 4.4+
+- **Framework**: Next.js 16 (App Router)
+- **Language**: TypeScript 5.9+
+- **UI Library**: React 19
+- **Styling**: Tailwind CSS 4
+- **State Management**: Zustand 5
 - **Data Fetching**: TanStack React Query 5
 - **Offline**: Workbox Service Worker, IndexedDB
 

@@ -5,10 +5,10 @@ Yoga: Sum of Sun and Moon longitudes divided by 13°20' (27 Yogas)
 Karana: Half of a Tithi (60 Karanas per lunar month, 11 types)
 """
 
-from datetime import datetime, timezone
 import swisseph as swe
 
 from ...models import YogaInfo, KaranaInfo, YOGA_NAMES, KARANA_MOVABLE, KARANA_FIXED
+from .utils import julian_to_datetime
 
 KARANA_NOMINAL_DAYS = 0.25  # ~6 hours in current MVP model assumptions
 KARANA_MIN_DAYS = 5 / 24
@@ -238,16 +238,6 @@ def find_karana_boundary(reference_jd: float, target_elongation: float, ayanamsa
             return jd
         jd += 0.01
     return reference_jd + KARANA_NOMINAL_DAYS
-
-
-def julian_to_datetime(julian_day: float) -> datetime:
-    """Convert Julian Day to Python datetime (UTC timezone-aware)"""
-    year, month, day, hour = swe.revjul(julian_day)
-    hour_int = int(hour)
-    minute = int((hour - hour_int) * 60)
-    second = int(((hour - hour_int) * 60 - minute) * 60)
-
-    return datetime(int(year), int(month), int(day), hour_int, minute, second, tzinfo=timezone.utc)
 
 
 def get_yoga_tamil_name(yoga_num: int) -> str:

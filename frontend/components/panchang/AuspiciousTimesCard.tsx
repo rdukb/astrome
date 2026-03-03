@@ -67,13 +67,15 @@ export const AuspiciousTimesCard: React.FC<AuspiciousTimesCardProps> = ({ pancha
       </div>
 
       <div className="space-y-3">
-        {/* Abhijit Muhurat */}
-        <TimePeriodRow
-          label="Abhijit Muhurat"
-          description="The most auspicious period of the day, around noon. Ideal for starting new ventures, signing documents, and performing ceremonies."
-          period={panchang.abhijit_muhurat}
-          icon={<Sparkles className="h-4 w-4" />}
-        />
+        {/* Abhijit Muhurat — not present on all days (e.g. Wednesdays) */}
+        {panchang.abhijit_muhurat && (
+          <TimePeriodRow
+            label="Abhijit Muhurat"
+            description="The most auspicious period of the day, around noon. Ideal for starting new ventures, signing documents, and performing ceremonies."
+            period={panchang.abhijit_muhurat}
+            icon={<Sparkles className="h-4 w-4" />}
+          />
+        )}
 
         {/* Brahma Muhurat */}
         <TimePeriodRow

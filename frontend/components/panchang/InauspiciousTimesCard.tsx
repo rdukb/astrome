@@ -103,17 +103,22 @@ export const InauspiciousTimesCard: React.FC<InauspiciousTimesCardProps> = ({ pa
           </div>
         )}
 
-        {/* Varjyam */}
-        {panchang.varjyam && (
+        {/* Varjyam — backend returns an array (can be multiple periods) */}
+        {panchang.varjyam && panchang.varjyam.length > 0 && (
           <div className="mt-6 pt-6 border-t border-rose-500/20">
             <h3 className="font-bold text-slate-200 mb-4 text-sm flex items-center gap-2">
               <AlertTriangle className="h-3 w-3 text-rose-400" />
               Varjyam
             </h3>
-            <TimePeriodRow
-              label="Varjyam Period"
-              period={panchang.varjyam}
-            />
+            <div className="space-y-2">
+              {panchang.varjyam.map((period, index) => (
+                <TimePeriodRow
+                  key={index}
+                  label={panchang.varjyam!.length > 1 ? `Varjyam ${index + 1}` : 'Varjyam Period'}
+                  period={period}
+                />
+              ))}
+            </div>
           </div>
         )}
       </div>

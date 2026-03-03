@@ -5,11 +5,11 @@ Calculates Tithi (lunar day) information using Swiss Ephemeris.
 Tithi = Moon-Sun elongation divided by 12 degrees (30 Tithis per lunar month).
 """
 
-from datetime import datetime, timezone
 import swisseph as swe
 from typing import Dict, Any
 
 from ...models import TithiInfo, TITHI_NAMES
+from .utils import julian_to_datetime
 
 
 # Lahiri ayanamsa (standard for Indian Panchang)
@@ -168,16 +168,6 @@ def get_elongation_at_jd(julian_day: float, ayanamsa: float) -> float:
     moon_sidereal = (moon_long - ayanamsa) % 360
 
     return (moon_sidereal - sun_sidereal) % 360
-
-
-def julian_to_datetime(julian_day: float) -> datetime:
-    """Convert Julian Day to Python datetime (UTC timezone-aware)"""
-    year, month, day, hour = swe.revjul(julian_day)
-    hour_int = int(hour)
-    minute = int((hour - hour_int) * 60)
-    second = int(((hour - hour_int) * 60 - minute) * 60)
-
-    return datetime(int(year), int(month), int(day), hour_int, minute, second, tzinfo=timezone.utc)
 
 
 def get_tithi_tamil_name(tithi_num: int) -> str:

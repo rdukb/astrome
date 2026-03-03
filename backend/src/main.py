@@ -86,13 +86,21 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
-# CORS middleware - Allow all origins in development
+# CORS middleware
+# Per the CORS spec, allow_credentials=True is incompatible with allow_origins=["*"].
+# Use explicit origins from settings when available; fall back to wildcard (no
+# credentials) for a public read-only API that doesn't rely on cookies/auth headers.
+_cors_origins = (
+    settings.cors_origins_list
+    if hasattr(settings, "cors_origins_list") and settings.cors_origins_list
+    else ["*"]
+)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Allow all origins for development
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_origins=_cors_origins,
+    allow_credentials=(_cors_origins != ["*"]),  # only True when origins are explicit
+    allow_methods=["GET", "OPTIONS"],
+    allow_headers=["Content-Type", "Accept"],
 )
 
 # Error handling
@@ -154,13 +162,6 @@ async def root():
         },
         "health": "/health",
     }
-
-
-# TODO: Import and mount route modules
-# from src.api.routes import panchang, locations, definitions
-# app.include_router(panchang.router, prefix="/api/v1", tags=["Panchang"])
-# app.include_router(locations.router, prefix="/api/v1", tags=["Locations"])
-# app.include_router(definitions.router, prefix="/api/v1", tags=["Definitions"])
 
 
 if __name__ == "__main__":

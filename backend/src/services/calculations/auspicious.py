@@ -4,8 +4,8 @@ Auspicious Times Calculation Service
 Calculates Abhijit Muhurat and Brahma Muhurat periods.
 """
 
-from datetime import datetime, timezone
 from ...models import TimePeriod
+from .utils import julian_to_datetime
 
 
 def calculate_abhijit_muhurat(sunrise_jd: float, sunset_jd: float) -> TimePeriod:
@@ -57,13 +57,3 @@ def calculate_brahma_muhurat(sunrise_jd: float) -> TimePeriod:
     )
 
 
-def julian_to_datetime(julian_day: float) -> datetime:
-    """Convert Julian Day to Python datetime (UTC timezone-aware)"""
-    import swisseph as swe
-
-    year, month, day, hour = swe.revjul(julian_day)
-    hour_int = int(hour)
-    minute = int((hour - hour_int) * 60)
-    second = int(((hour - hour_int) * 60 - minute) * 60)
-
-    return datetime(int(year), int(month), int(day), hour_int, minute, second, tzinfo=timezone.utc)

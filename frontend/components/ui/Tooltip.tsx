@@ -7,7 +7,7 @@
 'use client';
 
 import { cn } from '@/lib/utils';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useId, useRef, useState } from 'react';
 
 export interface TooltipProps {
   content: React.ReactNode;
@@ -24,6 +24,7 @@ const Tooltip: React.FC<TooltipProps> = ({
   children,
   className,
 }) => {
+  const tooltipId = useId();
   const [isVisible, setIsVisible] = useState(false);
   const [coords, setCoords] = useState({ top: 0, left: 0 });
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -90,7 +91,7 @@ const Tooltip: React.FC<TooltipProps> = ({
         onMouseLeave={hideTooltip}
         onFocus={showTooltip}
         onBlur={hideTooltip}
-        aria-describedby={isVisible ? 'tooltip' : undefined}
+        aria-describedby={isVisible ? tooltipId : undefined}
       >
         {children}
       </div>
@@ -98,7 +99,7 @@ const Tooltip: React.FC<TooltipProps> = ({
       {isVisible && (
         <div
           ref={tooltipRef}
-          id="tooltip"
+          id={tooltipId}
           role="tooltip"
           className={cn(
             'fixed z-50 rounded-md bg-gray-900 dark:bg-gray-100 px-3 py-2 text-sm text-white dark:text-gray-900 shadow-lg',

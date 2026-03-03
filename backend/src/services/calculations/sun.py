@@ -5,8 +5,8 @@ Calculates sunrise, sunset, noon times using Swiss Ephemeris.
 Also calculates moon rise/set times.
 """
 
-from datetime import datetime, timezone
 from typing import Optional
+from .utils import julian_to_datetime
 
 import swisseph as swe
 
@@ -156,11 +156,3 @@ def calculate_moon_times(julian_day: float, latitude: float, longitude: float) -
     return {"moonrise": julian_to_datetime(moonrise_jd), "moonset": julian_to_datetime(moonset_jd)}
 
 
-def julian_to_datetime(julian_day: float) -> datetime:
-    """Convert Julian Day to Python datetime (UTC timezone-aware)"""
-    year, month, day, hour = swe.revjul(julian_day)
-    hour_int = int(hour)
-    minute = int((hour - hour_int) * 60)
-    second = int(((hour - hour_int) * 60 - minute) * 60)
-
-    return datetime(int(year), int(month), int(day), hour_int, minute, second, tzinfo=timezone.utc)

@@ -66,8 +66,8 @@ export interface DailyPanchang {
   timezone: string; // IANA timezone
   sunrise: string; // ISO 8601 datetime
   sunset: string; // ISO 8601 datetime
-  moonrise: string;
-  moonset: string;
+  moonrise?: string;  // Optional: not always available (polar latitudes, near new/full moon)
+  moonset?: string;   // Optional: not always available
   tithi: TithiInfo;
   nakshatra: NakshatraInfo;
   yoga: YogaInfo;
@@ -76,8 +76,8 @@ export interface DailyPanchang {
   gulika_kalam: TimePeriod;
   yamaganda_kalam: TimePeriod;
   durmuhurtam: TimePeriod[];
-  varjyam: TimePeriod | null;
-  abhijit_muhurat: TimePeriod;
+  varjyam?: TimePeriod[];  // Array (backend returns List[TimePeriod] | null); may be absent
+  abhijit_muhurat?: TimePeriod; // Not present on all days (e.g. Wednesdays)
   brahma_muhurat: TimePeriod;
   tamil_month: string;
   tamil_year: string;

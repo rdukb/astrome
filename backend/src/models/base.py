@@ -6,6 +6,7 @@ and reusable mixins for timestamps and UUIDs.
 """
 
 from datetime import datetime
+from enum import StrEnum
 from typing import Any, Dict, Optional
 from uuid import UUID, uuid4
 
@@ -165,7 +166,7 @@ class CoordinatesMixin(BaseModel):
         return round(v, 6)
 
 
-class PakshaType(str):
+class PakshaType(StrEnum):
     """
     Enumeration of Paksha (lunar fortnight) types.
 

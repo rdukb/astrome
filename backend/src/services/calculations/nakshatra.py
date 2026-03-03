@@ -5,9 +5,9 @@ Calculates Nakshatra (lunar mansion) information using Swiss Ephemeris.
 27 Nakshatras, each 13°20' (360°/27).
 """
 
-from datetime import datetime, timezone
 import swisseph as swe
 from typing import Dict
+from .utils import julian_to_datetime
 
 from ...models import NakshatraInfo, NAKSHATRA_NAMES
 
@@ -169,16 +169,6 @@ def find_nakshatra_end(reference_jd: float, nakshatra_num: int, ayanamsa: float)
         jd += step
 
     return reference_jd + 1.0
-
-
-def julian_to_datetime(julian_day: float) -> datetime:
-    """Convert Julian Day to Python datetime (UTC timezone-aware)"""
-    year, month, day, hour = swe.revjul(julian_day)
-    hour_int = int(hour)
-    minute = int((hour - hour_int) * 60)
-    second = int(((hour - hour_int) * 60 - minute) * 60)
-
-    return datetime(int(year), int(month), int(day), hour_int, minute, second, tzinfo=timezone.utc)
 
 
 def get_nakshatra_tamil_name(nakshatra_num: int) -> str:

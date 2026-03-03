@@ -88,7 +88,7 @@ export const SunTimesCard: React.FC<SunTimesCardProps> = ({ panchang, className 
                   {item.label}
                 </p>
                 <p className="text-lg font-bold text-white whitespace-nowrap">
-                  {formatTime(item.time)}
+                  {item.time ? formatTime(item.time) : '—'}
                 </p>
               </div>
             </div>
