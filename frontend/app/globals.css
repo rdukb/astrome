@@ -1,0 +1,85 @@
+@import "tailwindcss";
+
+/* ── Tailwind v4 theme ─────────────────────────────────────────────────────
+   All customisation previously in tailwind.config.js now lives here.
+   The @theme block is the v4 equivalent of the `theme.extend` object.
+   ──────────────────────────────────────────────────────────────────────── */
+@theme {
+  /* Dark-UI palette */
+  --color-dark-bg: #0a0e27;
+  --color-dark-card: #1a1f3a;
+  --color-dark-border: #2d3555;
+  --color-dark-text-primary: #e2e8f0;
+  --color-dark-text-secondary: #94a3b8;
+  --color-dark-text-accent: #c084fc;
+
+  /* Auspicious (green) scale */
+  --color-auspicious-50: #f0fdf4;
+  --color-auspicious-100: #dcfce7;
+  --color-auspicious-200: #bbf7d0;
+  --color-auspicious-300: #86efac;
+  --color-auspicious-400: #4ade80;
+  --color-auspicious-500: #22c55e;
+  --color-auspicious-600: #16a34a;
+  --color-auspicious-700: #15803d;
+  --color-auspicious-800: #166534;
+  --color-auspicious-900: #14532d;
+
+  /* Inauspicious (red) scale — same values as primary */
+  --color-inauspicious-50: #fef2f2;
+  --color-inauspicious-100: #fee2e2;
+  --color-inauspicious-200: #fecaca;
+  --color-inauspicious-300: #fca5a5;
+  --color-inauspicious-400: #f87171;
+  --color-inauspicious-500: #ef4444;
+  --color-inauspicious-600: #dc2626;
+  --color-inauspicious-700: #b91c1c;
+  --color-inauspicious-800: #991b1b;
+  --color-inauspicious-900: #7f1d1d;
+
+  /* Typography */
+  --font-sans: var(--font-inter), system-ui, sans-serif;
+  --font-tamil: var(--font-noto-sans-tamil), sans-serif;
+}
+
+/* ── Design tokens (kept separate from @theme for runtime CSS var access) ── */
+:root {
+  --foreground-rgb: 31, 41, 55;
+  --background-start-rgb: 249, 250, 251;
+  --background-end-rgb: 255, 255, 255;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --foreground-rgb: 243, 244, 246;
+    --background-start-rgb: 17, 24, 39;
+    --background-end-rgb: 31, 41, 55;
+  }
+}
+
+body {
+  color: rgb(var(--foreground-rgb));
+  background: rgb(var(--background-start-rgb));
+  min-height: 100vh;
+}
+
+@layer base {
+  html {
+    @apply antialiased;
+  }
+
+  body {
+    @apply bg-transparent;
+  }
+
+  /* Dark theme support */
+  .dark body {
+    @apply text-gray-100;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}

@@ -1,0 +1,942 @@
+openapi: 3.1.0
+info:
+  title: Tamil Panchang API
+  description: |
+    REST API for Tamil Panchangam calculations based on Swiss Ephemeris.
+    Provides daily Panchang data, location services, and term definitions.
+  version: 1.0.0
+  contact:
+    name: Astrome Development Team
+  license:
+    name: AGPL-3.0
+    url: https://www.gnu.org/licenses/agpl-3.0.html
+
+servers:
+  - url: http://localhost:8000
+    description: Local development server
+  - url: https://api.astrome.example.com
+    description: Production API server
+
+tags:
+  - name: Panchang
+    description: Daily Panchang calculation endpoints
+  - name: Locations
+    description: Location management and search
+  - name: Definitions
+    description: Term definitions and educational content
+  - name: Health
+    description: API health and status
+
+paths:
+  # ============================================================================
+  # PANCHANG ENDPOINTS
+  # ============================================================================
+  
+  /api/v1/panchang:
+    get:
+      tags: [Panchang]
+      summary: Get daily Panchang for a specific date and location
+      description: |
+        Returns complete Panchang data including Tithi, Nakshatra, Yoga, Karana,
+        auspicious/inauspicious times, and special days.
+        
+        Results are cached. Subsequent requests for the same date/location return
+        instantly from cache.
+      operationId: getDailyPanchang
+      parameters:
+        - name: date
+          in: query
+          required: true
+          description: Date in YYYY-MM-DD format (ISO 8601)
+          schema:
+            type: string
+            format: date
+            example: "2026-02-06"
+        - name: latitude
+          in: query
+          required: true
+          description: Latitude coordinate (-66.5 to +66.5)
+          schema:
+            type: number
+            format: double
+            minimum: -66.5
+            maximum: 66.5
+            example: 13.0827
+        - name: longitude
+          in: query
+          required: true
+          description: Longitude coordinate (-180 to +180)
+          schema:
+            type: number
+            format: double
+            minimum: -180
+            maximum: 180
+            example: 80.2707
+        - name: timezone
+          in: query
+          required: true
+          description: IANA timezone identifier
+          schema:
+            type: string
+            example: "Asia/Kolkata"
+      responses:
+        '200':
+          description: Successfully calculated Panchang
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DailyPanchang'
+        '400':
+          description: Invalid parameters (date format, coordinates out of range)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '422':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        '500':
+          description: Calculation error (ephemeris data missing, internal error)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /api/v1/panchang/range:
+    get:
+      tags: [Panchang]
+      summary: Get Panchang data for a date range (monthly view)
+      description: |
+        Returns Panchang data for multiple consecutive dates.
+        Useful for monthly calendar view.
+        Maximum range: 31 days.
+      operationId: getPanchangRange
+      parameters:
+        - name: start_date
+          in: query
+          required: true
+          description: Start date (YYYY-MM-DD)
+          schema:
+            type: string
+            format: date
+            example: "2026-02-01"
+        - name: end_date
+          in: query
+          required: true
+          description: End date (YYYY-MM-DD, inclusive, max 31 days from start)
+          schema:
+            type: string
+            format: date
+            example: "2026-02-28"
+        - name: latitude
+          in: query
+          required: true
+          schema:
+            type: number
+            format: double
+            example: 13.0827
+        - name: longitude
+          in: query
+          required: true
+          schema:
+            type: number
+            format: double
+            example: 80.2707
+        - name: timezone
+          in: query
+          required: true
+          schema:
+            type: string
+            example: "Asia/Kolkata"
+      responses:
+        '200':
+          description: Array of Panchang data for each date
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  dates:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/DailyPanchang'
+                  count:
+                    type: integer
+                    description: Number of dates returned
+                    example: 28
+        '400':
+          description: Invalid date range (>31 days, start > end)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  # ============================================================================
+  # LOCATION ENDPOINTS
+  # ============================================================================
+
+  /api/v1/locations/search:
+    get:
+      tags: [Locations]
+      summary: Search for locations by name
+      description: |
+        Search for cities/locations by name. Returns top 10 matches.
+        Searches preloaded Indian cities first, then falls back to
+        OpenStreetMap Nominatim API for global search.
+      operationId: searchLocations
+      parameters:
+        - name: q
+          in: query
+          required: true
+          description: Search query (city name)
+          schema:
+            type: string
+            minLength: 2
+            example: "Chennai"
+        - name: limit
+          in: query
+          required: false
+          description: Maximum results to return (default 10, max 20)
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 20
+            default: 10
+      responses:
+        '200':
+          description: Array of matching locations
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  results:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Location'
+                  count:
+                    type: integer
+                    example: 5
+        '400':
+          description: Query too short (<2 characters)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /api/v1/locations/nearby:
+    get:
+      tags: [Locations]
+      summary: Find nearby preloaded cities
+      description: |
+        Returns preloaded cities within specified radius of coordinates.
+        Useful for "use current location" feature.
+      operationId: getNearbyLocations
+      parameters:
+        - name: latitude
+          in: query
+          required: true
+          schema:
+            type: number
+            format: double
+            example: 13.0827
+        - name: longitude
+          in: query
+          required: true
+          schema:
+            type: number
+            format: double
+            example: 80.2707
+        - name: radius_km
+          in: query
+          required: false
+          description: Search radius in kilometers (default 50, max 200)
+          schema:
+            type: number
+            format: double
+            minimum: 1
+            maximum: 200
+            default: 50
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 20
+            default: 5
+      responses:
+        '200':
+          description: Array of nearby cities sorted by distance
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  results:
+                    type: array
+                    items:
+                      allOf:
+                        - $ref: '#/components/schemas/Location'
+                        - type: object
+                          properties:
+                            distance_km:
+                              type: number
+                              description: Distance from query coordinates
+                              example: 12.5
+                  count:
+                    type: integer
+
+  /api/v1/locations/preloaded:
+    get:
+      tags: [Locations]
+      summary: Get all preloaded Indian cities
+      description: |
+        Returns the complete list of 100 preloaded major Indian cities.
+        Useful for offline dropdown/autocomplete.
+      operationId: getPreloadedLocations
+      responses:
+        '200':
+          description: Array of all preloaded cities
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  cities:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Location'
+                  count:
+                    type: integer
+                    example: 100
+
+  /api/v1/locations/timezone:
+    get:
+      tags: [Locations]
+      summary: Get timezone for coordinates
+      description: |
+        Returns IANA timezone identifier for given coordinates.
+        Uses timezonefinder library for accurate timezone detection.
+      operationId: getTimezone
+      parameters:
+        - name: latitude
+          in: query
+          required: true
+          schema:
+            type: number
+            format: double
+        - name: longitude
+          in: query
+          required: true
+          schema:
+            type: number
+            format: double
+      responses:
+        '200':
+          description: Timezone information
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  timezone:
+                    type: string
+                    example: "Asia/Kolkata"
+                  utc_offset:
+                    type: string
+                    description: Current UTC offset (e.g., +05:30)
+                    example: "+05:30"
+
+  # ============================================================================
+  # DEFINITIONS ENDPOINTS
+  # ============================================================================
+
+  /api/v1/definitions:
+    get:
+      tags: [Definitions]
+      summary: Get all term definitions
+      description: |
+        Returns definitions for all 20 core Panchang terms in English and Tamil.
+        Result is cacheable for 30 days (rarely changes).
+      operationId: getAllDefinitions
+      parameters:
+        - name: language
+          in: query
+          required: false
+          description: Filter by language (default returns both)
+          schema:
+            type: string
+            enum: [en, ta, both]
+            default: both
+      responses:
+        '200':
+          description: Array of term definitions
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  definitions:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/TermDefinition'
+                  count:
+                    type: integer
+                    example: 20
+
+  /api/v1/definitions/{term_id}:
+    get:
+      tags: [Definitions]
+      summary: Get specific term definition
+      description: |
+        Returns detailed definition for a specific term.
+        Includes short definition (for tooltip) and detailed explanation (for modal).
+      operationId: getDefinition
+      parameters:
+        - name: term_id
+          in: path
+          required: true
+          description: Term identifier (e.g., rahu_kalam, tithi, ekadashi)
+          schema:
+            type: string
+            example: "rahu_kalam"
+      responses:
+        '200':
+          description: Term definition
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TermDefinition'
+        '404':
+          description: Term not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  # ============================================================================
+  # HEALTH ENDPOINTS
+  # ============================================================================
+
+  /health:
+    get:
+      tags: [Health]
+      summary: API health check
+      description: Returns API status and version information
+      operationId: healthCheck
+      responses:
+        '200':
+          description: API is healthy
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: "healthy"
+                  version:
+                    type: string
+                    example: "1.0.0"
+                  timestamp:
+                    type: string
+                    format: date-time
+                  ephemeris_loaded:
+                    type: boolean
+                    description: Whether Swiss Ephemeris files are loaded
+                    example: true
+
+  /health/ephemeris:
+    get:
+      tags: [Health]
+      summary: Check ephemeris data status
+      description: |
+        Verifies Swiss Ephemeris files are present and accessible.
+        Returns date range covered by loaded ephemeris.
+      operationId: ephemerisHealth
+      responses:
+        '200':
+          description: Ephemeris status
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: "ready"
+                  files_loaded:
+                    type: array
+                    items:
+                      type: string
+                    example: ["seas_18.se1", "semo_18.se1", "sepl_18.se1"]
+                  date_range:
+                    type: object
+                    properties:
+                      start:
+                        type: string
+                        format: date
+                        example: "1900-01-01"
+                      end:
+                        type: string
+                        format: date
+                        example: "2100-12-31"
+
+# ==============================================================================
+# SCHEMAS
+# ==============================================================================
+
+components:
+  schemas:
+    DailyPanchang:
+      type: object
+      required:
+        - id
+        - date
+        - location
+        - timezone
+        - sunrise
+        - sunset
+        - tithi
+        - nakshatra
+        - yoga
+        - karana
+        - rahu_kalam
+        - gulika_kalam
+        - yamaganda_kalam
+        - brahma_muhurat
+        - durmuhurtam
+        - tamil_month
+        - tamil_year
+        - paksha
+        - calculated_at
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: "550e8400-e29b-41d4-a716-446655440000"
+        date:
+          type: string
+          format: date
+          example: "2026-02-06"
+        location:
+          $ref: '#/components/schemas/Location'
+        timezone:
+          type: string
+          example: "Asia/Kolkata"
+        sunrise:
+          type: string
+          format: date-time
+          description: Sunrise time in UTC
+          example: "2026-02-06T01:08:23Z"
+        sunset:
+          type: string
+          format: date-time
+          description: Sunset time in UTC
+          example: "2026-02-06T12:52:15Z"
+        moonrise:
+          type: string
+          format: date-time
+          nullable: true
+        moonset:
+          type: string
+          format: date-time
+          nullable: true
+        tithi:
+          $ref: '#/components/schemas/TithiInfo'
+        nakshatra:
+          $ref: '#/components/schemas/NakshatraInfo'
+        yoga:
+          $ref: '#/components/schemas/YogaInfo'
+        karana:
+          type: array
+          items:
+            $ref: '#/components/schemas/KaranaInfo'
+          minItems: 2
+          maxItems: 2
+        rahu_kalam:
+          $ref: '#/components/schemas/TimePeriod'
+        gulika_kalam:
+          $ref: '#/components/schemas/TimePeriod'
+        yamaganda_kalam:
+          $ref: '#/components/schemas/TimePeriod'
+        abhijit_muhurat:
+          allOf:
+            - $ref: '#/components/schemas/TimePeriod'
+          nullable: true
+        brahma_muhurat:
+          $ref: '#/components/schemas/TimePeriod'
+        varjyam:
+          type: array
+          items:
+            $ref: '#/components/schemas/TimePeriod'
+        durmuhurtam:
+          type: array
+          items:
+            $ref: '#/components/schemas/TimePeriod'
+          minItems: 1
+          maxItems: 3
+        tamil_month:
+          type: string
+          enum: [Chithirai, Vaikasi, Aani, Aadi, Avani, Purattasi, Aippasi, Karthigai, Margazhi, Thai, Masi, Panguni]
+          example: "Masi"
+        tamil_year:
+          type: string
+          example: "Vilambi"
+        paksha:
+          type: string
+          enum: [Shukla, Krishna]
+          example: "Shukla"
+        special_days:
+          type: array
+          items:
+            $ref: '#/components/schemas/SpecialDay'
+        calculated_at:
+          type: string
+          format: date-time
+          description: When this calculation was performed
+          example: "2026-02-06T10:30:00Z"
+
+    TithiInfo:
+      type: object
+      required:
+        - number
+        - name
+        - name_tamil
+        - paksha
+        - start_time
+        - end_time
+        - at_sunrise
+      properties:
+        number:
+          type: integer
+          minimum: 1
+          maximum: 30
+          example: 5
+        name:
+          type: string
+          example: "Panchami"
+        name_tamil:
+          type: string
+          example: "பஞ்சமி"
+        paksha:
+          type: string
+          enum: [Shukla, Krishna]
+          example: "Shukla"
+        start_time:
+          type: string
+          format: date-time
+          example: "2026-02-05T23:15:42Z"
+        end_time:
+          type: string
+          format: date-time
+          example: "2026-02-06T22:08:16Z"
+        at_sunrise:
+          type: boolean
+          description: True if this Tithi prevails at sunrise
+          example: true
+
+    NakshatraInfo:
+      type: object
+      required:
+        - number
+        - name
+        - name_tamil
+        - pada
+        - ruling_deity
+        - start_time
+        - end_time
+        - at_sunrise
+      properties:
+        number:
+          type: integer
+          minimum: 1
+          maximum: 27
+          example: 12
+        name:
+          type: string
+          example: "Uttara Phalguni"
+        name_tamil:
+          type: string
+          example: "உத்திரம்"
+        pada:
+          type: integer
+          minimum: 1
+          maximum: 4
+          example: 3
+        ruling_deity:
+          type: string
+          example: "Aryaman"
+        start_time:
+          type: string
+          format: date-time
+        end_time:
+          type: string
+          format: date-time
+        at_sunrise:
+          type: boolean
+          example: true
+
+    YogaInfo:
+      type: object
+      required:
+        - number
+        - name
+        - name_tamil
+      properties:
+        number:
+          type: integer
+          minimum: 1
+          maximum: 27
+          example: 8
+        name:
+          type: string
+          example: "Dhriti"
+        name_tamil:
+          type: string
+          example: "திருதி"
+
+    KaranaInfo:
+      type: object
+      required:
+        - name
+        - name_tamil
+        - type
+        - start_time
+        - end_time
+      properties:
+        name:
+          type: string
+          example: "Bava"
+        name_tamil:
+          type: string
+          example: "பவ"
+        type:
+          type: string
+          enum: [Movable, Fixed]
+          example: "Movable"
+        start_time:
+          type: string
+          format: date-time
+        end_time:
+          type: string
+          format: date-time
+
+    TimePeriod:
+      type: object
+      required:
+        - start_time
+        - end_time
+        - duration_minutes
+        - is_auspicious
+      properties:
+        start_time:
+          type: string
+          format: date-time
+          example: "2026-02-06T04:30:00Z"
+        end_time:
+          type: string
+          format: date-time
+          example: "2026-02-06T06:00:00Z"
+        duration_minutes:
+          type: integer
+          example: 90
+        is_auspicious:
+          type: boolean
+          example: false
+
+    SpecialDay:
+      type: object
+      required:
+        - type
+        - name
+        - name_tamil
+        - description
+        - significance
+      properties:
+        type:
+          type: string
+          enum: [Ekadashi, Pradosham, Amavasya, Purnima, Shivaratri, Sankranti, Festival, Auspicious]
+          example: "Ekadashi"
+        name:
+          type: string
+          example: "Vijaya Ekadashi"
+        name_tamil:
+          type: string
+          example: "விஜய ஏகாதசி"
+        description:
+          type: string
+          example: "Ekadashi of Shukla Paksha in Phalguna month"
+        significance:
+          type: string
+          example: "Observing fast on this day brings victory and prosperity"
+        observances:
+          type: array
+          items:
+            type: string
+          example: ["fasting", "puja", "reading scriptures"]
+        fasting_rules:
+          type: string
+          nullable: true
+          example: "Fast from sunrise to next day after Parana time"
+        parana_time:
+          type: string
+          format: date-time
+          nullable: true
+          description: Fast-breaking time (next day for Ekadashi)
+
+    Location:
+      type: object
+      required:
+        - id
+        - name
+        - display_name
+        - latitude
+        - longitude
+        - timezone
+        - country
+        - is_favorite
+        - created_at
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: "123e4567-e89b-12d3-a456-426614174000"
+        name:
+          type: string
+          example: "Chennai"
+        display_name:
+          type: string
+          example: "Chennai, Tamil Nadu, India"
+        latitude:
+          type: number
+          format: double
+          minimum: -66.5
+          maximum: 66.5
+          example: 13.0827
+        longitude:
+          type: number
+          format: double
+          minimum: -180
+          maximum: 180
+          example: 80.2707
+        timezone:
+          type: string
+          example: "Asia/Kolkata"
+        country:
+          type: string
+          example: "India"
+        state:
+          type: string
+          nullable: true
+          example: "Tamil Nadu"
+        is_favorite:
+          type: boolean
+          example: false
+        last_accessed:
+          type: string
+          format: date-time
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+
+    TermDefinition:
+      type: object
+      required:
+        - term_id
+        - name_en
+        - name_ta
+        - short_definition_en
+        - short_definition_ta
+        - detailed_explanation_en
+        - detailed_explanation_ta
+      properties:
+        term_id:
+          type: string
+          example: "rahu_kalam"
+        name_en:
+          type: string
+          example: "Rahu Kalam"
+        name_ta:
+          type: string
+          example: "ராகு காலம்"
+        short_definition_en:
+          type: string
+          example: "90-minute inauspicious period ruled by Rahu"
+        short_definition_ta:
+          type: string
+          example: "ராகு ஆளும் 90 நிமிட அசுப காலம்"
+        detailed_explanation_en:
+          type: string
+          example: "Rahu Kalam is one of the eight segments of the day..."
+        detailed_explanation_ta:
+          type: string
+          example: "ராகு காலம் நாளின் எட்டு பிரிவுகளில் ஒன்றாகும்..."
+        significance_tradition:
+          type: string
+          nullable: true
+          example: "In Tamil tradition, Rahu Kalam is strictly observed..."
+        calculation_method:
+          type: string
+          nullable: true
+          example: "Divide day (sunrise to sunset) into 8 equal parts..."
+        related_terms:
+          type: array
+          items:
+            type: string
+          example: ["gulika_kalam", "yamaganda", "durmuhurtam"]
+        sources:
+          type: array
+          items:
+            type: string
+          example: ["Brihat Parashara Hora Shastra", "Vedic tradition"]
+        icon:
+          type: string
+          nullable: true
+          example: "clock-alert"
+
+    Error:
+      type: object
+      required:
+        - error
+        - message
+      properties:
+        error:
+          type: string
+          example: "InvalidParameterError"
+        message:
+          type: string
+          example: "Date must be in YYYY-MM-DD format"
+        details:
+          type: object
+          additionalProperties: true
+
+    ValidationError:
+      type: object
+      required:
+        - error
+        - message
+        - validation_errors
+      properties:
+        error:
+          type: string
+          example: "ValidationError"
+        message:
+          type: string
+          example: "Request validation failed"
+        validation_errors:
+          type: array
+          items:
+            type: object
+            properties:
+              field:
+                type: string
+                example: "latitude"
+              message:
+                type: string
+                example: "Value must be between -66.5 and 66.5"

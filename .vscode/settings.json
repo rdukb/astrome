@@ -9,6 +9,136 @@
     "chat.tools.terminal.autoApprove": {
         ".specify/scripts/bash/": true,
         ".specify/scripts/powershell/": true
-    }
-}
+    },
 
+    // Python settings
+    "python.defaultInterpreterPath": "${workspaceFolder}/backend/.venv/bin/python",
+    "python.analysis.typeCheckingMode": "strict",
+    "python.analysis.autoImportCompletions": true,
+    "python.analysis.diagnosticMode": "workspace",
+    "python.formatting.provider": "black",
+    "python.linting.enabled": true,
+    "python.linting.ruffEnabled": true,
+    "python.linting.mypyEnabled": true,
+    "python.linting.pylintEnabled": false,
+    "[python]": {
+        "editor.defaultFormatter": "ms-python.black-formatter",
+        "editor.formatOnSave": true,
+        "editor.codeActionsOnSave": {
+            "source.organizeImports": "explicit"
+        },
+        "editor.rulers": [100]
+    },
+
+    // TypeScript/JavaScript settings
+    "[typescript]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "editor.formatOnSave": true,
+        "editor.codeActionsOnSave": {
+            "source.fixAll.eslint": "explicit",
+            "source.organizeImports": "explicit"
+        },
+        "editor.rulers": [100]
+    },
+    "[typescriptreact]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "editor.formatOnSave": true,
+        "editor.codeActionsOnSave": {
+            "source.fixAll.eslint": "explicit",
+            "source.organizeImports": "explicit"
+        },
+        "editor.rulers": [100]
+    },
+    "[javascript]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "editor.formatOnSave": true,
+        "editor.codeActionsOnSave": {
+            "source.fixAll.eslint": "explicit"
+        },
+        "editor.rulers": [100]
+    },
+    "[javascriptreact]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "editor.formatOnSave": true,
+        "editor.codeActionsOnSave": {
+            "source.fixAll.eslint": "explicit"
+        },
+        "editor.rulers": [100]
+    },
+    "[json]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "editor.formatOnSave": true
+    },
+    "[jsonc]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "editor.formatOnSave": true
+    },
+
+    // Markdown settings
+    "[markdown]": {
+        "editor.formatOnSave": true,
+        "editor.rulers": [80],
+        "editor.wordWrap": "on"
+    },
+
+    // General editor settings
+    "editor.formatOnPaste": false,
+    "editor.formatOnType": false,
+    "editor.insertSpaces": true,
+    "editor.tabSize": 2,
+    "files.trimTrailingWhitespace": true,
+    "files.insertFinalNewline": true,
+    "files.trimFinalNewlines": true,
+
+    // File associations
+    "files.associations": {
+        "*.toml": "toml",
+        "*.yaml": "yaml",
+        "*.yml": "yaml",
+        ".env*": "dotenv"
+    },
+
+    // Search exclude patterns
+    "search.exclude": {
+        "**/.venv": true,
+        "**/node_modules": true,
+        "**/.next": true,
+        "**/dist": true,
+        "**/build": true,
+        "**/__pycache__": true,
+        "**/*.pyc": true,
+        "**/coverage": true,
+        "**/.pytest_cache": true,
+        "**/playwright-report": true
+    },
+
+    // File watcher exclude patterns
+    "files.watcherExclude": {
+        "**/.venv/**": true,
+        "**/node_modules/**": true,
+        "**/.next/**": true,
+        "**/dist/**": true,
+        "**/build/**": true,
+        "**/__pycache__/**": true,
+        "**/.pytest_cache/**": true
+    },
+
+    // Testing
+    "python.testing.pytestEnabled": true,
+    "python.testing.unittestEnabled": false,
+    "python.testing.pytestArgs": [
+        "backend/tests"
+    ],
+
+    // Path intellisense
+    "typescript.preferences.importModuleSpecifier": "non-relative",
+    "javascript.preferences.importModuleSpecifier": "non-relative",
+
+    // ESLint
+    "eslint.workingDirectories": [
+        {
+            "directory": "./frontend",
+            "changeProcessCWD": true
+        }
+    ]
+}
