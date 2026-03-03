@@ -65,14 +65,6 @@ class PanchangCalculator:
         year, month, day = calculation_date.year, calculation_date.month, calculation_date.day
         julian_day = swe.julday(year, month, day, 0.0)
 
-        # Calculate timezone offset for sunrise checks
-        from datetime import datetime
-        import pytz
-
-        tz = pytz.timezone(timezone)
-        dt = tz.localize(datetime(year, month, day, 12, 0))
-        timezone_offset_hours = dt.utcoffset().total_seconds() / 3600
-
         # Calculate sun and moon times
         sun_times = calculate_sun_times(julian_day, latitude, longitude)
         moon_times = calculate_moon_times(julian_day, latitude, longitude)
@@ -85,9 +77,9 @@ class PanchangCalculator:
         weekday = calculation_date.weekday()
 
         # Calculate Panchang elements
-        tithi = calculate_tithi(julian_day, timezone_offset_hours)
-        nakshatra = calculate_nakshatra(julian_day, timezone_offset_hours)
-        yoga = calculate_yoga(julian_day, timezone_offset_hours)
+        tithi = calculate_tithi(julian_day, sunrise_jd)
+        nakshatra = calculate_nakshatra(julian_day, sunrise_jd)
+        yoga = calculate_yoga(julian_day, sunrise_jd)
         karanas = calculate_karana(julian_day, tithi.number)
 
         # Calculate inauspicious periods
