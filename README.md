@@ -124,12 +124,13 @@ Astrome production deployment uses **Firebase Hosting rewrites** as the primary 
 - Frontend (`frontend/.env.production`):
   - `NEXT_PUBLIC_API_URL=` (empty string; use relative `/api/**` paths)
 - Backend (`backend/.env` on Cloud Run):
-  - `CORS_ORIGINS=https://astrome.app,https://www.astrome.app`
+  - `CORS_ORIGINS=https://astrome.app,https://www.astrome.app,https://astrome-prod.web.app,https://astrome-prod.firebaseapp.com`
 
 ### Canonical Domain Guidance
 
 - Set `astrome.app` as the canonical host.
 - Keep `www.astrome.app` as a redirect/alias to canonical.
+- Keep `https://astrome-prod.web.app` and `https://astrome-prod.firebaseapp.com` as fallback preview hosts (not canonical).
 - Ensure Search Console is configured for canonical property.
 
 ### Post-Deploy Smoke Checks
