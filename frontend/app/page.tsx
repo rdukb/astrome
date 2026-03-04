@@ -18,6 +18,10 @@ import type { Location } from '@/types/location';
 import { motion } from 'motion/react';
 import { useEffect, useState } from 'react';
 
+const SITE_URL = 'https://astrome.app';
+const SEO_SUMMARY =
+  'Tamil Panchangam with daily local timings for Rahu Kalam, Gulika Kalam, Yamaganda, Abhijit Muhurat, and sunrise-based Vedic calendar details.';
+
 export default function PanchangPage() {
   const {
     selectedDate,
@@ -258,6 +262,33 @@ export default function PanchangPage() {
         />
       </div>
       <div className="relative z-10 max-w-[1600px] mx-auto">
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              '@context': 'https://schema.org',
+              '@type': 'WebSite',
+              name: 'Astrome',
+              url: SITE_URL,
+              description: SEO_SUMMARY,
+            }),
+          }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              '@context': 'https://schema.org',
+              '@type': 'WebApplication',
+              name: 'Astrome Tamil Panchangam',
+              applicationCategory: 'UtilitiesApplication',
+              operatingSystem: 'Web',
+              url: SITE_URL,
+              description: SEO_SUMMARY,
+            }),
+          }}
+        />
+
         {/* Header */}
         <motion.header
           initial={{ opacity: 0, y: -20 }}
@@ -281,6 +312,14 @@ export default function PanchangPage() {
             </button>
           </div>
         </motion.header>
+
+        <section className="mx-auto mb-6 max-w-4xl text-center">
+          <p className="text-sm leading-relaxed text-slate-300 sm:text-base">
+            Astrome provides a daily Tamil Panchangam with accurate location-based timings for
+            Rahu Kalam, Gulika Kalam, and Yamaganda, along with Tithi, Nakshatra, Yoga, Karana,
+            sunrise, and auspicious Muhurat periods.
+          </p>
+        </section>
 
         {/* Location and Date */}
         <motion.div
