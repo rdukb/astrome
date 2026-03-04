@@ -7,9 +7,12 @@ RUN apt-get update \
     && apt-get install -y --no-install-recommends gcc g++ python3-dev \
     && rm -rf /var/lib/apt/lists/*
 
-# Install Python dependencies first (layer-cached until requirements change)
+# Install Python dependencies — strip dev-only packages before installing
+# so the production image doesn't carry pytest/black/ruff/mypy.
 COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+RUN grep -Ev '^(pytest|pytest-asyncio|pytest-cov|black|ruff|mypy)\b' requirements.txt \
+      > requirements.prod.txt \
+    && pip install --no-cache-dir -r requirements.prod.txt
 
 # Copy application source (includes src/data/ephe for Swiss Ephemeris .se1 files)
 COPY src/ ./src/
