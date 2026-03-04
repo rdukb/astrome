@@ -33,9 +33,6 @@ export const metadata: Metadata = {
     'tithi nakshatra yoga karana',
   ],
   authors: [{ name: 'Astrome Development Team' }],
-  alternates: {
-    canonical: '/',
-  },
   openGraph: {
     type: 'website',
     url: 'https://astrome.app',
