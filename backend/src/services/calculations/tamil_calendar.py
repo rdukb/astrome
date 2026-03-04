@@ -50,17 +50,11 @@ def calculate_tamil_calendar(julian_day: float) -> dict:
     rashi_index = int(sun_long_sidereal / 30)
     tamil_month = TAMIL_MONTHS[rashi_index]
 
-    # Tamil year calculation
-    # Year starts with Mesha Sankranti (Sun entering Aries)
-    # If before Chithirai (Mesha), use previous year
-    year, month, day, _ = swe.revjul(julian_day)
-
-    # Rough approximation: Tamil year = Gregorian year - 1 if before April
-    # More accurate: check if before Mesha Sankranti
-    if rashi_index < 0 or (rashi_index == 0 and sun_long_sidereal < 5):
-        tamil_year_num = year - 1
-    else:
-        tamil_year_num = year
+    # Tamil year calculation:
+    # year changes at Mesha Sankranti (sidereal Sun entering Aries, 0°).
+    # Before that transition (roughly Jan-mid Apr), use previous Gregorian year.
+    year, _, _, _ = swe.revjul(julian_day)
+    tamil_year_num = year - 1 if sun_long_sidereal >= 270 else year
 
     # Tamil year names cycle (60-year cycle)
     tamil_year_name = get_tamil_year_name(tamil_year_num)
@@ -142,9 +136,12 @@ def get_tamil_year_name(gregorian_year: int) -> str:
         "Akshaya",
     ]
 
-    # Calculate position in 60-year cycle
-    # Reference: Year 2000 = Prabhava (index 0)
-    cycle_position = (gregorian_year - 2000) % 60
+    # Calculate position in 60-year cycle.
+    # Reference alignment:
+    # - 2024-2025 Tamil year: Krodhin (index 37)
+    # - 2025-2026 Tamil year: Vishvavasu (index 38)
+    # Therefore 1987 maps to index 0 (Prabhava) for this cycle list.
+    cycle_position = (gregorian_year - 1987) % 60
 
     return TAMIL_YEAR_NAMES[cycle_position]
 
