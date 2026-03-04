@@ -35,7 +35,7 @@ export default function PanchangPage() {
     clearCache,
   } = usePanchangStore();
 
-  const { coordinates, loading: geoLoading, error: geoError, requestLocation } = useGeolocation();
+  const { coordinates, loading: geoLoading, error: geoError, supported: geoSupported, requestLocation } = useGeolocation();
   const [hasRequestedLocation, setHasRequestedLocation] = useState(false);
   const [isClearingCache, setIsClearingCache] = useState(false);
   const [pendingUseCurrent, setPendingUseCurrent] = useState(false);
@@ -74,7 +74,7 @@ export default function PanchangPage() {
   }, [selectedDate, selectedLocation, coordinates, loadPanchang]);
 
   useEffect(() => {
-    if (!pendingUseCurrent || !coordinates) return;
+    if (!pendingUseCurrent || !coordinates || selectedLocation) return;
 
     const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
     setSelectedLocation({
@@ -91,13 +91,14 @@ export default function PanchangPage() {
       last_accessed: new Date().toISOString(),
     });
     setPendingUseCurrent(false);
-  }, [pendingUseCurrent, coordinates, setSelectedLocation]);
+  }, [pendingUseCurrent, coordinates, selectedLocation, setSelectedLocation]);
 
   const handleDateChange = (newDate: string) => {
     setSelectedDate(newDate);
   };
 
   const handleSelectLocation = (location: Location) => {
+    setPendingUseCurrent(false);
     setSelectedLocation(location);
   };
 
@@ -126,7 +127,7 @@ export default function PanchangPage() {
   };
 
   // Show loading skeleton
-  if ((isLoading || geoLoading) && !currentPanchang) {
+  if (isLoading && !currentPanchang) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-indigo-950 via-purple-950 to-slate-900 py-6 px-4 sm:py-8 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
@@ -291,7 +292,7 @@ export default function PanchangPage() {
           />
         </motion.div>
 
-        {!selectedLocation && !coordinates && !geoLoading && (
+        {!selectedLocation && !coordinates && (
           <section className="mx-auto mb-6 max-w-3xl rounded-xl border border-slate-700/60 bg-slate-900/60 p-4 text-center backdrop-blur">
             <p className="text-sm text-slate-200">
               Allow location for precise local timings, or search a city manually above.
@@ -302,11 +303,17 @@ export default function PanchangPage() {
                 the address bar to allow location, then try again.
               </p>
             )}
+            {geoError && geoError.code !== 1 && (
+              <p className="mt-2 text-xs text-amber-300">
+                {geoError.message || 'Unable to detect location. You can still search a city manually.'}
+              </p>
+            )}
             <button
               onClick={requestLocation}
-              className="mt-3 rounded-lg border border-cyan-500/40 bg-cyan-500/20 px-4 py-2 text-sm font-medium text-cyan-200 transition-colors hover:bg-cyan-500/30"
+              disabled={!geoSupported}
+              className="mt-3 rounded-lg border border-cyan-500/40 bg-cyan-500/20 px-4 py-2 text-sm font-medium text-cyan-200 transition-colors hover:bg-cyan-500/30 disabled:cursor-not-allowed disabled:opacity-60"
             >
-              {geoError?.code === 1 ? 'Try Location Again' : 'Enable Location'}
+              {!geoSupported ? 'Geolocation Unsupported' : geoError?.code === 1 ? 'Try Location Again' : 'Enable Location'}
             </button>
           </section>
         )}
