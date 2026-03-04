@@ -29,6 +29,9 @@ jobs:
         working-directory: frontend
       - run: pnpm run build
         working-directory: frontend
+      - name: Remove pinTag for preview channel deploy
+        run: |
+          node -e "const fs=require('fs');const path='firebase.json';const config=JSON.parse(fs.readFileSync(path,'utf8'));for(const rewrite of (config.hosting?.rewrites ?? [])){if(rewrite?.run?.pinTag){delete rewrite.run.pinTag;}}fs.writeFileSync(path,JSON.stringify(config,null,2)+'\n');"
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: ${{ secrets.GITHUB_TOKEN }}

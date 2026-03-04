@@ -10,6 +10,9 @@ export const metadata: Metadata = {
   title: 'About — Astrome Tamil Panchangam',
   description:
     'About Astrome, the open-source Tamil Panchangam app powered by Swiss Ephemeris and Vedic astronomy.',
+  alternates: {
+    canonical: '/about',
+  },
 };
 
 /* ── small presentational helpers ────────────────────────────────────────── */

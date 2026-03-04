@@ -8,6 +8,9 @@ import Link from 'next/link';
 export const metadata: Metadata = {
   title: 'Help — Tamil Panchangam',
   description: 'Guide to reading and understanding the Tamil Panchangam',
+  alternates: {
+    canonical: '/help',
+  },
 };
 
 /* ── Section data ────────────────────────────────────────────────────────── */
