@@ -19,6 +19,13 @@ def test_calculate_tamil_calendar_pre_mesha_uses_previous_tamil_year():
     assert result["tamil_year"] == "Vishvavasu"
 
 
+def test_calculate_tamil_calendar_january_uses_previous_tamil_year():
+    # January 5, 2026 is before Mesha Sankranti and must still map to 2025 Tamil year.
+    jd = swe.julday(2026, 1, 5, 12.0)
+    result = calculate_tamil_calendar(jd)
+    assert result["tamil_year"] == "Vishvavasu"
+
+
 def test_calculate_tamil_calendar_post_mesha_uses_current_tamil_year():
     # April 20, 2026 (after Mesha Sankranti) should be 2026 Tamil year.
     jd = swe.julday(2026, 4, 20, 12.0)
