@@ -53,9 +53,6 @@ importers:
       tailwindcss:
         specifier: 4.2.1
         version: 4.2.1
-      test@latest:
-        specifier: link:playwright/test@latest
-        version: link:playwright/test@latest
       workbox-window:
         specifier: 7.4.0
         version: 7.4.0
