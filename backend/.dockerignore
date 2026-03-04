@@ -1,0 +1,15 @@
+venv/
+__pycache__/
+**/__pycache__/
+*.pyc
+*.pyo
+.env
+*.db
+logs/
+tests/
+alembic/
+alembic.ini
+docs/
+pyproject.toml
+.mypy_cache/
+.ruff_cache/

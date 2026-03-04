@@ -169,8 +169,8 @@ export default function PanchangPage() {
             </div>
             <p className="text-red-300 mb-4">{error}</p>
             <div className="text-sm text-slate-300 mb-4">
-              <p>Backend URL: {process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}</p>
-              <p>Make sure the backend server is running on port 8000</p>
+              <p>Backend URL: {process.env.NEXT_PUBLIC_API_URL || '/api (via proxy)'}</p>
+              <p>Make sure the backend server is reachable</p>
             </div>
             <button
               onClick={() => {

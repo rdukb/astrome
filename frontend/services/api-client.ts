@@ -11,8 +11,11 @@
 import type { APIErrorResponse } from '@/types/api';
 import axios, { AxiosError, AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
 
-// API base URL from environment variable
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+// API base URL — empty string in production (Firebase rewrites /api/** to Cloud Run)
+const API_BASE_URL =
+  process.env.NEXT_PUBLIC_API_URL !== undefined
+    ? process.env.NEXT_PUBLIC_API_URL
+    : 'http://localhost:8000';
 
 /**
  * Create configured Axios instance

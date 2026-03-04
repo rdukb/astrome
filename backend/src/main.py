@@ -10,7 +10,9 @@ Provides RESTful API for Tamil Panchangam calculations with:
 
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI
+import time
+
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
@@ -139,6 +141,37 @@ async def health_check():
             "database": {
                 "url": settings.database_url.split("///")[-1],  # Hide full path
             },
+        }
+    )
+
+
+# Proxy-aware health check — accessible via Firebase rewrite at /api/health
+# Confirms end-to-end: browser → Firebase CDN → Cloud Run
+@app.get("/api/health", tags=["Health"])
+async def api_health_check(request: Request):
+    """
+    Health check reachable through the Firebase /api/** rewrite.
+
+    Returns proxy headers so you can confirm Firebase is forwarding correctly.
+    """
+    from src.services import get_ephemeris
+
+    ephe = get_ephemeris()
+
+    return JSONResponse(
+        content={
+            "status": "online",
+            "timestamp": time.time(),
+            "service": "astrome-api",
+            "version": settings.api_version,
+            "message": "Tamil Panchang engine is warm.",
+            "ephemeris": {
+                "using_builtin": ephe.is_using_builtin(),
+                "path": settings.ephe_path_absolute or "built-in Moshier",
+            },
+            # x-forwarded-for is set by Firebase/GCP when proxying;
+            # "direct-access" means the request bypassed the proxy
+            "proxy_check": request.headers.get("x-forwarded-for", "direct-access"),
         }
     )
 
