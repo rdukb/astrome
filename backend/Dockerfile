@@ -2,17 +2,18 @@ FROM python:3.11-slim
 
 WORKDIR /app
 
-# Install system dependencies needed by pyswisseph (C + C++ extension) and timezonefinder
-RUN apt-get update \
-    && apt-get install -y --no-install-recommends gcc g++ python3-dev \
-    && rm -rf /var/lib/apt/lists/*
-
 # Install Python dependencies — strip dev-only packages before installing
 # so the production image doesn't carry pytest/black/ruff/mypy.
+# Build tools (gcc/g++/python3-dev) are required by pyswisseph and timezonefinder
+# but are purged after pip install to keep the final image slim.
 COPY requirements.txt .
-RUN grep -Ev '^(pytest|pytest-asyncio|pytest-cov|black|ruff|mypy)\b' requirements.txt \
-      > requirements.prod.txt \
-    && pip install --no-cache-dir -r requirements.prod.txt
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends gcc g++ python3-dev \
+    && grep -Ev '^(pytest|pytest-asyncio|pytest-cov|black|ruff|mypy)\b' requirements.txt \
+         > requirements.prod.txt \
+    && pip install --no-cache-dir -r requirements.prod.txt \
+    && apt-get purge -y --auto-remove gcc g++ python3-dev \
+    && rm -rf /var/lib/apt/lists/*
 
 # Copy application source (includes src/data/ephe for Swiss Ephemeris .se1 files)
 COPY src/ ./src/
