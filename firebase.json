@@ -16,12 +16,6 @@
       }
     ]
   },
-  "apphosting": [
-    {
-      "backendId": "astrome-frontend",
-      "rootDir": "frontend"
-    }
-  ],
   "firestore": {
     "database": "(default)",
     "location": "us-west1",
