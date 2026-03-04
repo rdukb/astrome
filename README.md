@@ -107,6 +107,59 @@ cp .env.local.example .env.local
 # npm run dev
 ```
 
+## Production Deployment (Firebase Hosting + Cloud Run)
+
+Astrome production deployment uses **Firebase Hosting rewrites** as the primary path:
+
+- `https://astrome.app/*` serves frontend
+- `https://astrome.app/api/**` proxies to Cloud Run service `astrome-api`
+
+### Source of Truth
+
+- Use [`firebase.json`](firebase.json) as the active Hosting/rewrite configuration.
+- [`apphosting.yaml`](apphosting.yaml) is kept in-repo for compatibility/reference, but is **not** the primary deployment path for this setup.
+
+### Required Production Environment Values
+
+- Frontend (`frontend/.env.production`):
+  - `NEXT_PUBLIC_API_URL=` (empty string; use relative `/api/**` paths)
+- Backend (`backend/.env` on Cloud Run):
+  - `CORS_ORIGINS=https://astrome.app,https://www.astrome.app`
+
+### Canonical Domain Guidance
+
+- Set `astrome.app` as the canonical host.
+- Keep `www.astrome.app` as a redirect/alias to canonical.
+- Ensure Search Console is configured for canonical property.
+
+### Post-Deploy Smoke Checks
+
+Run these checks after each deploy:
+
+```bash
+# SEO artifacts
+curl -I https://astrome.app/robots.txt
+curl -I https://astrome.app/sitemap.xml
+
+# Security headers at edge
+curl -I https://astrome.app
+
+# API proxy through Hosting rewrite
+curl -s https://astrome.app/api/v1/definitions | head
+curl -s "https://astrome.app/api/v1/panchang?date=2026-03-04&latitude=37.2647&longitude=-121.9623&timezone=America/Los_Angeles" | head
+```
+
+### SEO Operations Checklist
+
+1. Verify property in Google Search Console (`https://astrome.app`).
+2. Submit sitemap: `https://astrome.app/sitemap.xml`.
+3. Use URL Inspection on homepage and request indexing after major changes.
+4. Track impressions/clicks for target queries:
+   - `Tamil Panchang`
+   - `Tamil Panchangam`
+   - `Tamil Panchanga`
+5. Monitor coverage warnings and fix crawl/indexing issues promptly.
+
 ## Tech Stack
 
 ### Backend
