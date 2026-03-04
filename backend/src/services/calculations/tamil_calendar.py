@@ -52,9 +52,13 @@ def calculate_tamil_calendar(julian_day: float) -> dict:
 
     # Tamil year calculation:
     # year changes at Mesha Sankranti (sidereal Sun entering Aries, 0°).
-    # Before that transition (roughly Jan-mid Apr), use previous Gregorian year.
-    year, _, _, _ = swe.revjul(julian_day)
-    tamil_year_num = year - 1 if sun_long_sidereal >= 270 else year
+    # Jan-Mar are always part of previous Tamil year.
+    # In April, switch year only after Sun enters Aries (sidereal < 30°).
+    year, month, _, _ = swe.revjul(julian_day)
+    if month < 4 or (month == 4 and sun_long_sidereal >= 330):
+        tamil_year_num = year - 1
+    else:
+        tamil_year_num = year
 
     # Tamil year names cycle (60-year cycle)
     tamil_year_name = get_tamil_year_name(tamil_year_num)

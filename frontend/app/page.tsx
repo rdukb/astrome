@@ -35,7 +35,7 @@ export default function PanchangPage() {
     clearCache,
   } = usePanchangStore();
 
-  const { coordinates, loading: geoLoading, requestLocation } = useGeolocation();
+  const { coordinates, loading: geoLoading, error: geoError, requestLocation } = useGeolocation();
   const [hasRequestedLocation, setHasRequestedLocation] = useState(false);
   const [isClearingCache, setIsClearingCache] = useState(false);
   const [pendingUseCurrent, setPendingUseCurrent] = useState(false);
@@ -198,54 +198,6 @@ export default function PanchangPage() {
     );
   }
 
-  // Show location request if needed
-  if (!coordinates && !selectedLocation && !geoLoading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-indigo-950 via-purple-950 to-slate-900 py-8 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto">
-          <header className="mb-8">
-            <h1 className="text-4xl font-bold text-white text-center">
-              Tamil Panchangam
-            </h1>
-          </header>
-          <div className="bg-slate-800/60 border border-slate-700/50 rounded-lg p-8 text-center max-w-md mx-auto backdrop-blur-lg">
-            <svg
-              className="w-16 h-16 mx-auto mb-4 text-cyan-400"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-              />
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-              />
-            </svg>
-            <h2 className="text-xl font-semibold text-slate-100 mb-2">
-              Location Access Required
-            </h2>
-            <p className="text-slate-300 mb-6">
-              We need your location to calculate accurate Panchang times for your area.
-            </p>
-            <button
-              onClick={requestLocation}
-              className="px-6 py-3 bg-cyan-500/20 text-cyan-200 rounded-lg hover:bg-cyan-500/30 transition-colors font-medium border border-cyan-500/40"
-            >
-              Enable Location
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   // Main content
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-950 via-purple-950 to-slate-900 overflow-y-auto py-6 px-4 sm:py-8 sm:px-6 lg:px-8">
@@ -338,6 +290,26 @@ export default function PanchangPage() {
             onDateChange={handleDateChange}
           />
         </motion.div>
+
+        {!selectedLocation && !coordinates && !geoLoading && (
+          <section className="mx-auto mb-6 max-w-3xl rounded-xl border border-slate-700/60 bg-slate-900/60 p-4 text-center backdrop-blur">
+            <p className="text-sm text-slate-200">
+              Allow location for precise local timings, or search a city manually above.
+            </p>
+            {geoError?.code === 1 && (
+              <p className="mt-2 text-xs text-amber-300">
+                Location permission is blocked in your browser. Use the lock/site settings icon in
+                the address bar to allow location, then try again.
+              </p>
+            )}
+            <button
+              onClick={requestLocation}
+              className="mt-3 rounded-lg border border-cyan-500/40 bg-cyan-500/20 px-4 py-2 text-sm font-medium text-cyan-200 transition-colors hover:bg-cyan-500/30"
+            >
+              {geoError?.code === 1 ? 'Try Location Again' : 'Enable Location'}
+            </button>
+          </section>
+        )}
 
         {/* Panchang Content */}
         {currentPanchang && (
