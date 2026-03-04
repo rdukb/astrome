@@ -1,0 +1,20 @@
+# Firebase App Hosting — Next.js frontend configuration
+# See https://firebase.google.com/docs/app-hosting/configure
+
+# Tell App Hosting where the Next.js app lives
+appRoot: frontend
+
+runConfig:
+  minInstances: 0
+  maxInstances: 10
+  concurrency: 80
+  cpu: 1
+  memoryMiB: 512
+
+# Runtime environment variables for the Next.js server
+# env:
+#   - variable: NEXT_PUBLIC_API_URL
+#     value: https://astrome-api-<hash>-uc.a.run.app
+#     availability:
+#       - BUILD
+#       - RUNTIME
