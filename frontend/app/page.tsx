@@ -88,8 +88,10 @@ export default function PanchangPage() {
   // GA4: panchang_view_loaded — fire once per unique date+location combination
   useEffect(() => {
     if (!currentPanchang) return;
-    const locationLabel = selectedLocation?.name ?? 'Current Location';
-    const key = `${selectedDate}__${locationLabel}`;
+    const locationLabel = selectedLocation?.name ?? (coordinates ? 'Current Location' : 'Unknown');
+    const locationKey = selectedLocation?.id
+      ?? (coordinates ? `coords-${coordinates.latitude.toFixed(4)}-${coordinates.longitude.toFixed(4)}` : 'unknown');
+    const key = `${selectedDate}__${locationKey}`;
     if (lastTrackedKey.current === key) return;
     lastTrackedKey.current = key;
     trackPanchangViewLoaded({
@@ -97,7 +99,7 @@ export default function PanchangPage() {
       location_label: locationLabel,
       days_from_today: diffDays(selectedDate),
     });
-  }, [currentPanchang, selectedDate, selectedLocation]);
+  }, [currentPanchang, selectedDate, selectedLocation, coordinates]);
 
   // GA4: api_error_shown — fire when full-page error state is visible
   useEffect(() => {
@@ -105,9 +107,9 @@ export default function PanchangPage() {
     trackApiErrorShown({
       error_type: classifyError(error),
       date: selectedDate,
-      location_label: selectedLocation?.name ?? 'none',
+      location_label: selectedLocation?.name ?? (coordinates ? 'Current Location' : 'unknown'),
     });
-  }, [error, currentPanchang, selectedDate, selectedLocation]);
+  }, [error, currentPanchang, selectedDate, selectedLocation, coordinates]);
 
   useEffect(() => {
     if (!pendingUseCurrent || !coordinates || selectedLocation) return;
@@ -126,6 +128,7 @@ export default function PanchangPage() {
       created_at: new Date().toISOString(),
       last_accessed: new Date().toISOString(),
     });
+    trackLocationSelected({ method: 'geolocation', location_label: 'Current Location' });
     setPendingUseCurrent(false);
   }, [pendingUseCurrent, coordinates, selectedLocation, setSelectedLocation]);
 
@@ -143,7 +146,6 @@ export default function PanchangPage() {
   const handleUseCurrentLocation = () => {
     setPendingUseCurrent(true);
     requestLocation();
-    trackLocationSelected({ method: 'geolocation', location_label: 'Current Location' });
   };
 
   const handleClearCache = async () => {

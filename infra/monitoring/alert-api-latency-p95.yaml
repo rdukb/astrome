@@ -9,12 +9,12 @@ userLabels:
 documentation:
   mimeType: text/markdown
   content: |
-    Summary: API p95 latency exceeded 1200ms for 10 minutes.
+    Summary: API p95 latency exceeded 1.2s for 10 minutes.
     Impact: Slow page loads and delayed data updates.
     Runbook: Check request latency panel and recent traffic/resource spikes.
     Escalation: Create incident ticket if sustained > 30 minutes.
 conditions:
-  - displayName: p95 latency > 1200ms (10m)
+  - displayName: p95 latency > 1.2s (10m)
     conditionThreshold:
       filter: |
         resource.type="cloud_run_revision"
@@ -26,7 +26,7 @@ conditions:
           perSeriesAligner: ALIGN_PERCENTILE_95
           crossSeriesReducer: REDUCE_MEAN
       comparison: COMPARISON_GT
-      thresholdValue: 1200
+      thresholdValue: 1.2
       duration: 600s
       trigger:
         count: 1

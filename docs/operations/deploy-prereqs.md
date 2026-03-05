@@ -35,7 +35,7 @@ gcloud services list --enabled --project "$PROJECT_ID" | grep -E 'run.googleapis
 
 ## 2) Required IAM Roles
 
-Create/identify deployment principals and grant least-privilege roles.
+Create/identify deployment principals and grant the baseline roles below.
 
 ### Human deployer (or CI principal)
 
@@ -57,7 +57,7 @@ Grant example:
 ```bash
 PROJECT_ID="<your-project-id>"
 DEPLOYER="user:you@example.com"   # or serviceAccount:ci@project.iam.gserviceaccount.com
-RUNTIME_SA="astrome-api@${PROJECT_ID}.iam.gserviceaccount.com"
+RUNTIME_SA="<runtime-service-account-email>"
 
 gcloud projects add-iam-policy-binding "$PROJECT_ID" \
   --member="$DEPLOYER" --role="roles/run.admin"
@@ -78,6 +78,17 @@ gcloud projects add-iam-policy-binding "$PROJECT_ID" \
   --member="serviceAccount:${RUNTIME_SA}" --role="roles/logging.logWriter"
 gcloud projects add-iam-policy-binding "$PROJECT_ID" \
   --member="serviceAccount:${RUNTIME_SA}" --role="roles/monitoring.metricWriter"
+```
+
+Find runtime service account email:
+
+```bash
+SERVICE="astrome-api"
+REGION="<region>"
+
+gcloud run services describe "$SERVICE" \
+  --region "$REGION" \
+  --format='value(spec.template.spec.serviceAccountName)'
 ```
 
 Verification:
@@ -159,7 +170,7 @@ curl -I https://astrome.app/sitemap.xml
 # Homepage + API health
 curl -I https://astrome.app/
 curl -s https://astrome.app/api/v1/definitions | head
-curl -s "https://astrome.app/api/v1/panchang?date=2026-03-04&latitude=37.2647&longitude=-121.9623&timezone=America/Los_Angeles" | head
+curl -s "https://astrome.app/api/v1/panchang?date=$(date +%F)&latitude=37.2647&longitude=-121.9623&timezone=America/Los_Angeles" | head
 ```
 
 ## 7) Exit Criteria

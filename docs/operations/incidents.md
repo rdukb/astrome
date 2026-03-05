@@ -40,7 +40,7 @@ curl -I https://astrome.app/sitemap.xml
 ```bash
 # Firebase Hosting status (requires gcloud/firebase auth)
 firebase hosting:sites:list
-firebase target
+firebase hosting:channel:list
 ```
 
 - Inspect browser console for runtime hydration/build errors.

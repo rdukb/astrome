@@ -16,7 +16,7 @@ Time range defaults: last 6 hours. Auto-refresh: 1 minute.
 ```txt
 resource.type="uptime_url"
 metric.type="monitoring.googleapis.com/uptime_check/check_passed"
-metric.labels.check_id="<CHECK_ID_FOR_astrome-api-health-prod>"
+metric.labels.check_id="${uptime_check_id}"
 ```
 
 - Alignment: `1m`, aligner `ALIGN_FRACTION_TRUE`
@@ -31,8 +31,8 @@ metric.labels.check_id="<CHECK_ID_FOR_astrome-api-health-prod>"
 
 ```txt
 resource.type="cloud_run_revision"
-resource.labels.service_name="astrome-api"
-resource.labels.location="us-central1"
+resource.labels.service_name="${service_name}"
+resource.labels.location="${region}"
 metric.type="run.googleapis.com/request_count"
 ```
 
@@ -57,13 +57,13 @@ metric.type="run.googleapis.com/request_count"
 
 ```txt
 resource.type="cloud_run_revision"
-resource.labels.service_name="astrome-api"
-resource.labels.location="us-central1"
+resource.labels.service_name="${service_name}"
+resource.labels.location="${region}"
 metric.type="run.googleapis.com/request_latencies"
 ```
 
 - Alignment: `1m`, aligner `ALIGN_PERCENTILE_95`
-- Threshold line: `1200 ms`
+- Threshold line: `1.2 s`
 
 ### Panel 5: CPU Utilization
 
@@ -119,5 +119,6 @@ metadata.user_labels.service="astrome-api"
 - `service_name` default `astrome-api`
 - `region` default `us-central1`
 - `env` default `prod`
+- `uptime_check_id` default `<CHECK_ID_FOR_astrome-api-health-prod>`
 
 All panel filters must be parameterized with these variables for reuse across environments.

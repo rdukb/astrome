@@ -20,7 +20,7 @@ This folder contains Wave 2 alert policy skeletons for `astrome-api`.
 ## Notes
 
 - API error-rate policies include traffic gates (`>=20/5m` and `>=50/10m`) as separate AND conditions.
-- Latency threshold is set as `1200` to match the Wave 2 spec (`1200ms`). If your metric view is seconds, set this to `1.2`.
+- Latency threshold is set as `1.2` seconds to match Cloud Monitoring metric units. If your view expects milliseconds, use `1200`.
 - Uptime policy uses MQL to capture `3 consecutive` 1-minute probe failures.
 
 ## Apply Example

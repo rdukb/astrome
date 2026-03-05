@@ -46,7 +46,7 @@ Fired when the API response is successfully rendered for the first time after a
 location + date combination is resolved.
 
 **Trigger point:** `frontend/app/page.tsx` — inside the `useEffect` that calls
-`loadPanchang`, after `currentPanchang` becomes non-null.
+`trackPanchangViewLoaded`, after `currentPanchang` becomes non-null and deduped by date+location key.
 
 | Parameter | Type | Example | Notes |
 |---|---|---|---|
@@ -58,7 +58,7 @@ location + date combination is resolved.
 trackPanchangViewLoaded({
   date: selectedDate,
   location_label: selectedLocation?.name ?? 'Current Location',
-  days_from_today: diffDays(selectedDate, today()),
+  days_from_today: diffDays(selectedDate),
 });
 ```
 
@@ -70,7 +70,7 @@ Fired whenever the user chooses a location — either by picking from search res
 by granting browser geolocation.
 
 **Trigger point:** `frontend/app/page.tsx` — `handleSelectLocation` and the
-`pendingUseCurrent` effect that resolves the current-location flow.
+`pendingUseCurrent` effect after geolocation resolves successfully.
 
 | Parameter | Type | Example | Notes |
 |---|---|---|---|
@@ -101,7 +101,7 @@ Fired when the user navigates to a different date via the `DateSelector`.
 ```ts
 trackDateChanged({
   date: newDate,
-  days_from_today: diffDays(newDate, today()),
+  days_from_today: diffDays(newDate),
 });
 ```
 
@@ -135,7 +135,7 @@ no cached panchang to fall back to).
 trackApiErrorShown({
   error_type: classifyError(error),
   date: selectedDate,
-  location_label: selectedLocation?.name ?? 'none',
+  location_label: selectedLocation?.name ?? (coordinates ? 'Current Location' : 'unknown'),
 });
 ```
 
@@ -145,8 +145,8 @@ trackApiErrorShown({
 
 - **No coordinates sent to GA4.** `latitude` / `longitude` are never included in event
   parameters.
-- **No user IDs.** GA4 is used in cookieless / anonymous mode; do not call
-  `gtag('config', id, { user_id: ... })`.
+- **No user IDs.** Do not call `gtag('config', id, { user_id: ... })`.
+- **IP anonymization enabled.** `anonymize_ip: true` is configured in `frontend/app/layout.tsx`.
 - **Consent mode.** If you add a cookie banner in the future, integrate
   [GA4 Consent Mode v2](https://support.google.com/analytics/answer/9976101) before
   collecting any data from EU/UK visitors.

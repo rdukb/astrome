@@ -14,7 +14,7 @@ This document defines Wave 2 balanced alert thresholds and routing for productio
 | `prod-uptime-fail` | 3 consecutive uptime probe failures (1m checks) | 3 minutes | critical | slack-critical |
 | `prod-api-hard-fail` | 5xx rate >= 10% for 5m AND total requests >= 20 per 5m | 5 minutes | critical | slack-critical |
 | `prod-api-elevated-fail` | 5xx rate >= 3% for 10m AND total requests >= 50 per 10m | 10 minutes | warning | slack-warning |
-| `prod-api-latency-p95` | p95 latency > 1200ms for 10m | 10 minutes | warning | slack-warning |
+| `prod-api-latency-p95` | p95 latency > 1.2s for 10m | 10 minutes | warning | slack-warning |
 | `prod-infra-stress` | memory > 85% OR CPU > 80% for 10m | 10 minutes | warning | slack-warning |
 
 ## Policy Specs
@@ -71,7 +71,7 @@ metric.type="run.googleapis.com/request_latencies"
 ```
 
 - Alignment: `1m`, `ALIGN_PERCENTILE_95`
-- Trigger: `p95 > 1200ms` for 10 minutes.
+- Trigger: `p95 > 1.2s` for 10 minutes.
 - Labels: `env=prod`, `service=astrome-api`, `severity=warning`, `route=slack-warning`
 
 ### 5) `prod-infra-stress`
