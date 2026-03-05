@@ -12,11 +12,19 @@ import { InauspiciousTimesCard } from '@/components/panchang/InauspiciousTimesCa
 import { PanchangCard } from '@/components/panchang/PanchangCard';
 import { PanchangSkeleton } from '@/components/panchang/PanchangSkeleton';
 import { SunTimesCard } from '@/components/panchang/SunTimesCard';
+import {
+  classifyError,
+  diffDays,
+  trackApiErrorShown,
+  trackDateChanged,
+  trackLocationSelected,
+  trackPanchangViewLoaded,
+} from '@/lib/analytics';
 import { useGeolocation } from '@/hooks/useGeolocation';
 import { usePanchangStore } from '@/stores/panchang-store';
 import type { Location } from '@/types/location';
 import { motion } from 'motion/react';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 const SITE_URL = 'https://astrome.app';
 const SEO_SUMMARY =
@@ -39,6 +47,10 @@ export default function PanchangPage() {
   const [hasRequestedLocation, setHasRequestedLocation] = useState(false);
   const [isClearingCache, setIsClearingCache] = useState(false);
   const [pendingUseCurrent, setPendingUseCurrent] = useState(false);
+
+  // Track the last (date, location) pair we fired panchang_view_loaded for,
+  // so we don't re-fire on every render while data is stable.
+  const lastTrackedKey = useRef<string | null>(null);
 
   // Request geolocation on mount if no location is set
   useEffect(() => {
@@ -73,6 +85,30 @@ export default function PanchangPage() {
     }
   }, [selectedDate, selectedLocation, coordinates, loadPanchang]);
 
+  // GA4: panchang_view_loaded — fire once per unique date+location combination
+  useEffect(() => {
+    if (!currentPanchang) return;
+    const locationLabel = selectedLocation?.name ?? 'Current Location';
+    const key = `${selectedDate}__${locationLabel}`;
+    if (lastTrackedKey.current === key) return;
+    lastTrackedKey.current = key;
+    trackPanchangViewLoaded({
+      date: selectedDate,
+      location_label: locationLabel,
+      days_from_today: diffDays(selectedDate),
+    });
+  }, [currentPanchang, selectedDate, selectedLocation]);
+
+  // GA4: api_error_shown — fire when full-page error state is visible
+  useEffect(() => {
+    if (!error || currentPanchang) return;
+    trackApiErrorShown({
+      error_type: classifyError(error),
+      date: selectedDate,
+      location_label: selectedLocation?.name ?? 'none',
+    });
+  }, [error, currentPanchang, selectedDate, selectedLocation]);
+
   useEffect(() => {
     if (!pendingUseCurrent || !coordinates || selectedLocation) return;
 
@@ -95,16 +131,19 @@ export default function PanchangPage() {
 
   const handleDateChange = (newDate: string) => {
     setSelectedDate(newDate);
+    trackDateChanged({ date: newDate, days_from_today: diffDays(newDate) });
   };
 
   const handleSelectLocation = (location: Location) => {
     setPendingUseCurrent(false);
     setSelectedLocation(location);
+    trackLocationSelected({ method: 'manual', location_label: location.name });
   };
 
   const handleUseCurrentLocation = () => {
     setPendingUseCurrent(true);
     requestLocation();
+    trackLocationSelected({ method: 'geolocation', location_label: 'Current Location' });
   };
 
   const handleClearCache = async () => {
