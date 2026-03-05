@@ -20,11 +20,11 @@ conditions:
       query: |
         fetch uptime_url
         | metric 'monitoring.googleapis.com/uptime_check/check_passed'
-        | filter metric.check_id == 'UPTIME_CHECK_ID'
+        | filter metric.labels.check_id == 'UPTIME_CHECK_ID'
         | align next_older(1m)
         | every 1m
         | group_by sliding(3m), [failed: sum(if(val() < 1, 1, 0))]
-        | condition failed >= 3
+        | condition failed == 3
 alertStrategy:
   autoClose: 900s
   notificationRateLimit:

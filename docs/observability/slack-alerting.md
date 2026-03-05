@@ -16,14 +16,14 @@ This spec defines Slack routing and message standards for Wave 2 alert delivery.
 Create two Slack notification channels in Cloud Monitoring:
 
 1. `slack-critical`
-- Slack workspace: Astrome workspace
-- Destination: `#astrome-alerts-critical`
-- Used by: `prod-uptime-fail`, `prod-api-hard-fail`
+   - Slack workspace: Astrome workspace
+   - Destination: `#astrome-alerts-critical`
+   - Used by: `prod-uptime-fail`, `prod-api-hard-fail`
 
 2. `slack-warning`
-- Slack workspace: Astrome workspace
-- Destination: `#astrome-alerts-warning`
-- Used by: `prod-api-elevated-fail`, `prod-api-latency-p95`, `prod-infra-stress`
+   - Slack workspace: Astrome workspace
+   - Destination: `#astrome-alerts-warning`
+   - Used by: `prod-api-elevated-fail`, `prod-api-latency-p95`, `prod-infra-stress`
 
 ## Policy-to-Route Mapping
 
@@ -37,7 +37,7 @@ Create two Slack notification channels in Cloud Monitoring:
 
 ## Message Content Standard
 
-Use custom documentation fields in each alert policy to standardize Slack payloads.
+Use alert policy documentation plus user labels to standardize Slack payload context.
 
 Required sections:
 
@@ -46,18 +46,17 @@ Required sections:
 - `Runbook`: triage steps and dashboard links
 - `Escalation`: who to page if not resolved
 
-Template:
+Template (human-readable structure):
 
 ```txt
-[{{policy.display_name}}] {{condition.name}}
-Service: astrome-api | Env: prod | Severity: {{policy.user_label.severity}}
-Value: {{metric.value}} | Threshold: {{condition.threshold_value}} | Window: {{condition.duration}}
+[<alert-policy-name>] <condition-name>
+Service: astrome-api | Env: prod | Severity: critical|warning
+Current value: <metric value> | Window: <evaluation window>
 
-Impact: {{policy.documentation.impact}}
-Runbook: {{policy.documentation.runbook}}
-Escalation: {{policy.documentation.escalation}}
-Incident: {{incident.url}}
-Dashboard: {{policy.documentation.dashboard}}
+Impact: <user-facing impact>
+Runbook: <doc/dashboard link>
+Escalation: <on-call path>
+Incident URL: <monitoring incident link>
 ```
 
 ## Escalation Rules

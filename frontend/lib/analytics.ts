@@ -38,14 +38,22 @@ function canTrack(): boolean {
 
 /** Returns today's date as YYYY-MM-DD in the local timezone. */
 function today(): string {
-  return new Date().toISOString().slice(0, 10);
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, '0');
+  const day = String(now.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
 }
 
 /** Signed days between two YYYY-MM-DD strings (b − a). */
 export function diffDays(dateStr: string, referenceStr: string = today()): number {
   const MS_PER_DAY = 86_400_000;
-  const a = new Date(referenceStr).getTime();
-  const b = new Date(dateStr).getTime();
+  const parseIsoDateLocal = (value: string): Date => {
+    const [year, month, day] = value.split('-').map(Number);
+    return new Date(year, month - 1, day);
+  };
+  const a = parseIsoDateLocal(referenceStr).getTime();
+  const b = parseIsoDateLocal(dateStr).getTime();
   return Math.round((b - a) / MS_PER_DAY);
 }
 

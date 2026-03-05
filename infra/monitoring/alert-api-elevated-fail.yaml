@@ -35,7 +35,7 @@ conditions:
         - alignmentPeriod: 600s
           perSeriesAligner: ALIGN_SUM
           crossSeriesReducer: REDUCE_SUM
-      comparison: COMPARISON_GT
+      comparison: COMPARISON_GE
       thresholdValue: 0.03
       duration: 600s
       trigger:
@@ -51,7 +51,7 @@ conditions:
         - alignmentPeriod: 600s
           perSeriesAligner: ALIGN_SUM
           crossSeriesReducer: REDUCE_SUM
-      comparison: COMPARISON_GT
+      comparison: COMPARISON_GE
       thresholdValue: 50
       duration: 600s
       trigger:

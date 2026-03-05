@@ -26,7 +26,7 @@ resource.labels.location="us-central1"
 | `api_request_total` | `run.googleapis.com/request_count` | requests | Sum over window | none | Denominator for error-rate and traffic gates |
 | `api_request_5xx` | `run.googleapis.com/request_count` | requests | Sum over window | `metric.labels.response_code_class="5xx"` | Numerator for API failure ratios |
 | `api_error_rate_5xx` | Derived (`api_request_5xx / api_request_total`) | percent | Aligned ratio by window | same as above | API hard/elevated failure policy |
-| `api_latency_p95` | `run.googleapis.com/request_latencies` | ms | 95th percentile over window | none | User-facing backend latency SLI |
+| `api_latency_p95` | `run.googleapis.com/request_latencies` | seconds | 95th percentile over window | none | User-facing backend latency SLI |
 | `infra_cpu_utilization` | `run.googleapis.com/container/cpu/utilizations` | ratio (0-1) | Mean over window | none | CPU saturation detection |
 | `infra_memory_utilization` | `run.googleapis.com/container/memory/utilizations` | ratio (0-1) | Mean over window | none | Memory saturation detection |
 | `uptime_check_passed` | `monitoring.googleapis.com/uptime_check/check_passed` | bool | Fraction true over window | `resource.type="uptime_url"` + check ID/host filter | End-to-end availability |

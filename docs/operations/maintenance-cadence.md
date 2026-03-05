@@ -1,6 +1,6 @@
 # Operations Maintenance Cadence
 
-This cadence keeps Astrome deployment, reliability, and observability hygiene current.
+This cadence keeps Astrome's deployment, reliability, and observability hygiene current.
 
 ## Weekly
 
