@@ -1,0 +1,33 @@
+displayName: prod-uptime-fail
+enabled: true
+combiner: OR
+userLabels:
+  env: prod
+  service: astrome-api
+  severity: critical
+  route: slack-critical
+documentation:
+  mimeType: text/markdown
+  content: |
+    Summary: astrome.app/api/health failed 3 consecutive 1-minute checks.
+    Impact: Users may not be able to access API-backed pages.
+    Runbook: Astrome - API SLO Overview dashboard, then Astrome - Alert Triage.
+    Escalation: Page on-call if unresolved in 15 minutes.
+conditions:
+  - displayName: 3 consecutive uptime failures (1m checks)
+    conditionMonitoringQueryLanguage:
+      duration: 0s
+      query: |
+        fetch uptime_url
+        | metric 'monitoring.googleapis.com/uptime_check/check_passed'
+        | filter metric.check_id == 'UPTIME_CHECK_ID'
+        | align next_older(1m)
+        | every 1m
+        | group_by sliding(3m), [failed: sum(if(val() < 1, 1, 0))]
+        | condition failed >= 3
+alertStrategy:
+  autoClose: 900s
+  notificationRateLimit:
+    period: 900s
+notificationChannels:
+  - projects/PROJECT_ID/notificationChannels/SLACK_CRITICAL_CHANNEL_ID

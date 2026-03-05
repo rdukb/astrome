@@ -1,0 +1,64 @@
+displayName: prod-api-hard-fail
+enabled: true
+combiner: AND
+userLabels:
+  env: prod
+  service: astrome-api
+  severity: critical
+  route: slack-critical
+documentation:
+  mimeType: text/markdown
+  content: |
+    Summary: API 5xx ratio is >= 10% for 5 minutes with enough traffic.
+    Impact: Significant request failures visible to users.
+    Runbook: Check 5xx panel + recent deploys; rollback if needed.
+    Escalation: Immediate on-call response.
+conditions:
+  - displayName: 5xx ratio >= 10% (5m)
+    conditionThreshold:
+      filter: |
+        resource.type="cloud_run_revision"
+        resource.labels.service_name="astrome-api"
+        resource.labels.location="us-central1"
+        metric.type="run.googleapis.com/request_count"
+        metric.labels.response_code_class="5xx"
+      denominatorFilter: |
+        resource.type="cloud_run_revision"
+        resource.labels.service_name="astrome-api"
+        resource.labels.location="us-central1"
+        metric.type="run.googleapis.com/request_count"
+      aggregations:
+        - alignmentPeriod: 300s
+          perSeriesAligner: ALIGN_SUM
+          crossSeriesReducer: REDUCE_SUM
+      denominatorAggregations:
+        - alignmentPeriod: 300s
+          perSeriesAligner: ALIGN_SUM
+          crossSeriesReducer: REDUCE_SUM
+      comparison: COMPARISON_GT
+      thresholdValue: 0.10
+      duration: 300s
+      trigger:
+        count: 1
+  - displayName: total requests >= 20 (5m)
+    conditionThreshold:
+      filter: |
+        resource.type="cloud_run_revision"
+        resource.labels.service_name="astrome-api"
+        resource.labels.location="us-central1"
+        metric.type="run.googleapis.com/request_count"
+      aggregations:
+        - alignmentPeriod: 300s
+          perSeriesAligner: ALIGN_SUM
+          crossSeriesReducer: REDUCE_SUM
+      comparison: COMPARISON_GT
+      thresholdValue: 20
+      duration: 300s
+      trigger:
+        count: 1
+alertStrategy:
+  autoClose: 900s
+  notificationRateLimit:
+    period: 900s
+notificationChannels:
+  - projects/PROJECT_ID/notificationChannels/SLACK_CRITICAL_CHANNEL_ID

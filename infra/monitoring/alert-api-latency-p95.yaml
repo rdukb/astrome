@@ -1,0 +1,38 @@
+displayName: prod-api-latency-p95
+enabled: true
+combiner: OR
+userLabels:
+  env: prod
+  service: astrome-api
+  severity: warning
+  route: slack-warning
+documentation:
+  mimeType: text/markdown
+  content: |
+    Summary: API p95 latency exceeded 1200ms for 10 minutes.
+    Impact: Slow page loads and delayed data updates.
+    Runbook: Check request latency panel and recent traffic/resource spikes.
+    Escalation: Create incident ticket if sustained > 30 minutes.
+conditions:
+  - displayName: p95 latency > 1200ms (10m)
+    conditionThreshold:
+      filter: |
+        resource.type="cloud_run_revision"
+        resource.labels.service_name="astrome-api"
+        resource.labels.location="us-central1"
+        metric.type="run.googleapis.com/request_latencies"
+      aggregations:
+        - alignmentPeriod: 60s
+          perSeriesAligner: ALIGN_PERCENTILE_95
+          crossSeriesReducer: REDUCE_MEAN
+      comparison: COMPARISON_GT
+      thresholdValue: 1200
+      duration: 600s
+      trigger:
+        count: 1
+alertStrategy:
+  autoClose: 900s
+  notificationRateLimit:
+    period: 3600s
+notificationChannels:
+  - projects/PROJECT_ID/notificationChannels/SLACK_WARNING_CHANNEL_ID
