@@ -208,6 +208,9 @@ See [tasks.md](specs/001-tamil-panchang-ui/tasks.md) for complete task breakdown
 - **[Data Model](specs/001-tamil-panchang-ui/data-model.md)**: Entity schemas
 - **[API Contracts](specs/001-tamil-panchang-ui/contracts/panchang-api.yaml)**: OpenAPI specification
 - **[Tasks](specs/001-tamil-panchang-ui/tasks.md)**: Implementation task breakdown
+- **[Incident Runbooks](docs/operations/incidents.md)**: Triage and mitigation playbooks for common production incidents
+- **[Deployment Prerequisites](docs/operations/deploy-prereqs.md)**: IAM, API enablement, and verification checklist
+- **[Maintenance Cadence](docs/operations/maintenance-cadence.md)**: Weekly-to-quarterly operations hygiene schedule
 
 ## Troubleshooting
 
